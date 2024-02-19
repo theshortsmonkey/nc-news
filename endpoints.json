@@ -30,8 +30,7 @@
     "description": "serves an article chosen by its id",
     "queries": [],
     "exampleResponse": {
-      "article": [
-        {
+      "article": {
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
@@ -40,7 +39,6 @@
           "votes": 0,
           "comment_count": 6
         }
-      ]
     }
   }
 }
