@@ -21,3 +21,13 @@ describe("/api/topics endpoint", () => {
     })
   })
 })
+describe("error handling", () => {
+  test("404 for missing endpoints", () => {
+    return request(app)
+    .get('/api/missing')
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toEqual('/api/missing endpoint not found')
+  })
+  })
+})
