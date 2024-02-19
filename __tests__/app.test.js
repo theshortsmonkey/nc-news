@@ -152,5 +152,27 @@ describe.only("/api/articles/:article_id/comments endpoint", () => {
       })
     })
   })
-
+  test("GET: 200 returned comments should be sorted by most recent first", () => {return request(app)
+    .get('/api/articles/3/comments')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.comments).toBeSortedBy('created_at',{descending: true})
+    })
+  })
+  test('GET: 400 when requesting comments from an article using an invalid id', () => {
+    return request(app)
+      .get('/api/articles/cat/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid id supplied')
+      })
+  })
+  test("GET: 404 when requesting comments from an article with an id that doesn't exist", () => {
+    return request(app)
+      .get('/api/articles/99999/comments')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('requested ID not found')
+      })
+  })
 })
