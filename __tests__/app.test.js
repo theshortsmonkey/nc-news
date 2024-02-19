@@ -135,3 +135,44 @@ describe('/api/articles endpoint', () => {
       })
   })
 })
+describe.only("/api/articles/:article_id/comments endpoint", () => {
+  test("GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id", () => {
+    return request(app)
+    .get('/api/articles/3/comments')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.comments).toHaveLength(2)
+      body.comments.forEach((comment) => {
+        expect(typeof comment.comment_id).toBe('number')
+        expect(typeof comment.votes).toBe('number')
+        expect(typeof comment.created_at).toBe('string')
+        expect(typeof comment.author).toBe('string')
+        expect(typeof comment.body).toBe('string')
+        expect(typeof comment.article_id).toBe('number')
+      })
+    })
+  })
+  test("GET: 200 returned comments should be sorted by most recent first", () => {return request(app)
+    .get('/api/articles/3/comments')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.comments).toBeSortedBy('created_at',{descending: true})
+    })
+  })
+  test('GET: 400 when requesting comments from an article using an invalid id', () => {
+    return request(app)
+      .get('/api/articles/cat/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid id supplied')
+      })
+  })
+  test("GET: 404 when requesting comments from an article with an id that doesn't exist", () => {
+    return request(app)
+      .get('/api/articles/99999/comments')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('requested ID not found')
+      })
+  })
+})
