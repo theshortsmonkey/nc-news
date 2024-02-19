@@ -135,3 +135,13 @@ describe('/api/articles endpoint', () => {
       })
   })
 })
+describe("/api/articles/:article_id/comments endpoint", () => {
+  test("GET: 200 should return an array of all comments for the supplied article id", () => {
+    return request(app)
+    .get('/api/articles/3/comments')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.comments).toHaveLength(2)
+    })
+  })
+})
