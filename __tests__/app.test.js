@@ -7,7 +7,7 @@ const fs = require('fs/promises')
 const { convertTimestampToDate } = require('../db/seeds/utils.js')
 
 beforeEach(() => seed(testData))
-afterAll(() => db.end)
+afterAll(() => db.end())
 
 describe('routing issues', () => {
   test('404 for missing endpoints', () => {
