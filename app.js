@@ -1,7 +1,8 @@
 const express = require('express')
 const fs = require('fs/promises')
 const { getTopics } = require('./controllers/topics.controllers')
-const { handleServerErrors } = require('./controllers/error.controllers')
+const { handleServerErrors, handlePsqlErrors, handleCustomErrors } = require('./controllers/error.controllers')
+const { getArticleById } = require('./controllers/articles.controllers')
 
 app = express()
 
@@ -13,9 +14,12 @@ app.get('/api',(req,res,next) => {
   })
 })
 app.get('/api/topics',getTopics)
+app.get('/api/articles/:article_id',getArticleById)
 
 app.all('/*',handleMissingEndpoints)
 
+app.use(handleCustomErrors)
+app.use(handlePsqlErrors)
 app.use(handleServerErrors)
 
 function handleMissingEndpoints(req,res) {
