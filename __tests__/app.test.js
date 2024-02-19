@@ -118,7 +118,6 @@ describe('/api/articles endpoint', () => {
       .get('/api/articles')
       .expect(200)
       .then(({ body }) => {
-        console.log(body.articles[0])
         expect(body.articles[0].comment_count).toBe(2)
         body.articles.forEach((article) => {
           expect(typeof article.comment_count).toBe('number')
