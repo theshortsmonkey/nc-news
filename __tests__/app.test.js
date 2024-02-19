@@ -15,7 +15,9 @@ describe('routing issues', () => {
       .get('/api/missing')
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toEqual('/api/missing endpoint not found, get /api for a description of available endpoints')
+        expect(body.msg).toEqual(
+          '/api/missing endpoint not found, get /api for a description of available endpoints'
+        )
       })
   })
 })
@@ -49,40 +51,88 @@ describe('/api/topics endpoint', () => {
   })
 })
 describe('/api/articles/:article_id endpoint', () => {
-  test("GET: 200 should return the article identified by the specified article_id", () => {
+  test('GET: 200 should return the article identified by the specified article_id', () => {
     const expectedArticle = {
       article_id: 1,
-      title: "Living in the shadow of a great man",
-      topic: "mitch",
-      author: "butter_bridge",
-      body: "I find this existence challenging",
-      created_at: "2020-07-09T20:11:00.000Z",
+      title: 'Living in the shadow of a great man',
+      topic: 'mitch',
+      author: 'butter_bridge',
+      body: 'I find this existence challenging',
+      created_at: '2020-07-09T20:11:00.000Z',
       votes: 100,
       article_img_url:
-        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
     }
     return request(app)
-    .get('/api/articles/1')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.article).toEqual(expectedArticle)
-    })
+      .get('/api/articles/1')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toEqual(expectedArticle)
+      })
   })
-  test("GET: 400 when requesting an article with an invalid id", () => {
+  test('GET: 400 when requesting an article with an invalid id', () => {
     return request(app)
-    .get('/api/articles/cat')
-    .expect(400)
-    .then(({body}) => {
-      expect(body.msg).toEqual('invalid id supplied')
-    })
+      .get('/api/articles/cat')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid id supplied')
+      })
   })
   test("GET: 404 when requesting an article with an id that doesn't exist", () => {
     return request(app)
-    .get('/api/articles/99999')
-    .expect(404)
-    .then(({body}) => {
-      expect(body.msg).toEqual('requested ID not found')
-    })
+      .get('/api/articles/99999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('requested ID not found')
+      })
   })
 })
-
+describe('/api/articles endpoint', () => {
+  test('GET: 200 should return an array of all articles, all articles should have the following core properties: article_id,author,title,topic,created_at,votes,article_img_url', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toHaveLength(13)
+        body.articles.forEach((article) => {
+          expect(typeof article.article_id).toBe('number')
+          expect(typeof article.author).toBe('string')
+          expect(typeof article.title).toBe('string')
+          expect(typeof article.topic).toBe('string')
+          expect(typeof article.created_at).toBe('string')
+          expect(typeof article.votes).toBe('number')
+          expect(typeof article.article_img_url).toBe('string')
+        })
+      })
+  })
+  test('GET: 200 should return an array of all articles, sorted by date created in descending order', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('created_at', { descending: true })
+      })
+  })
+  test('GET: 200 returned articles should have a comment_count which is the total count of all comments on each article_id', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body.articles[0])
+        expect(body.articles[0].comment_count).toBe(2)
+        body.articles.forEach((article) => {
+          expect(typeof article.comment_count).toBe('number')
+        })
+      })
+  })
+  test('GET: 200 none of the returned articles should have a body property', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article).not.toHaveProperty('body')
+        })
+      })
+  })
+})
