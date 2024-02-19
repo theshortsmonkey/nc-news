@@ -175,4 +175,19 @@ describe("/api/articles/:article_id/comments endpoint", () => {
         expect(body.msg).toEqual('requested ID not found')
       })
   })
+  test("POST: 201 should return the posted comment", () => {
+    return request(app)
+    .post('/api/articles/3/comments')
+    .send({username:'butter_bridge', body: 'Gotta love a pug gif'})
+    .expect(201)
+    .then(({body}) => {
+      const {postedComment} = body
+      expect(postedComment.author).toBe('butter_bridge')
+      expect(postedComment.body).toBe('Gotta love a pug gif')
+      expect(postedComment.article_id).toBe(3)
+      expect(postedComment.votes).toBe(0)
+      expect(postedComment.comment_id).toBe(19)
+      expect(typeof postedComment.created_at).toBe('string')
+    })
+  })
 })
