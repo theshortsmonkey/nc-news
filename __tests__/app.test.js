@@ -135,13 +135,22 @@ describe('/api/articles endpoint', () => {
       })
   })
 })
-describe("/api/articles/:article_id/comments endpoint", () => {
-  test("GET: 200 should return an array of all comments for the supplied article id", () => {
+describe.only("/api/articles/:article_id/comments endpoint", () => {
+  test("GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id", () => {
     return request(app)
     .get('/api/articles/3/comments')
     .expect(200)
     .then(({body}) => {
       expect(body.comments).toHaveLength(2)
+      body.comments.forEach((comment) => {
+        expect(typeof comment.comment_id).toBe('number')
+        expect(typeof comment.votes).toBe('number')
+        expect(typeof comment.created_at).toBe('string')
+        expect(typeof comment.author).toBe('string')
+        expect(typeof comment.body).toBe('string')
+        expect(typeof comment.article_id).toBe('number')
+      })
     })
   })
+
 })
