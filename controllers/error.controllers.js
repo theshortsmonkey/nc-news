@@ -1,5 +1,5 @@
 exports.handleMissingEndpoints = (req,res,next) => {
-  return res.status(404).send({msg:`${req.url} endpoint not found`})
+  return res.status(404).send({msg:`${req.url} endpoint not found, get /api for a description of available endpoints`})
 }
 
 exports.handleServerErrors = (err,req,res,next) => {
