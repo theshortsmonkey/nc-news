@@ -1,3 +1,8 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+## Setup 
+>Files required to connect to local databases:
+> - .env.development
+> - .env.test
+
+These files should contain the enviroment variable 'PGDATABASE' pointing to the relevant test and development database names. Speak to secret keeper to get database names.
