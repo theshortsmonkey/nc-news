@@ -20,11 +20,8 @@ app.use(handlePsqlErrors)
 app.use(handleServerErrors)
 
 function getApiDetails(req,res,next) {
-  return fs.readFile(`${__dirname}/endpoints.json`)
-  .then((rawEndpoints) => {
-    const endpoints = JSON.parse(rawEndpoints)
-    res.status(200).send({endpoints})
-  })
+  const endpoints = require(`${__dirname}/endpoints.json`)
+  return res.status(200).send({endpoints})
 }
 
 function handleMissingEndpoints(req,res) {
