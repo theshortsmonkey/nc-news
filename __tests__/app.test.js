@@ -135,7 +135,7 @@ describe('/api/articles endpoint', () => {
       })
   })
 })
-describe.only("/api/articles/:article_id/comments endpoint", () => {
+describe("/api/articles/:article_id/comments endpoint", () => {
   test("GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id", () => {
     return request(app)
     .get('/api/articles/3/comments')
