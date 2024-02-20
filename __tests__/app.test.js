@@ -59,7 +59,8 @@ describe('/api/articles/:article_id endpoint', () => {
       .get('/api/articles/1')
       .expect(200)
       .then(({ body }) => {
-        expect(body.article).toEqual(expectedArticle)
+        const {comment_count,...article} = body.article
+        expect(article).toEqual(expectedArticle)
       })
   })
   test('GET: 400 when requesting an article with an invalid id', () => {
@@ -77,6 +78,14 @@ describe('/api/articles/:article_id endpoint', () => {
       .then(({ body }) => {
         expect(body.msg).toEqual('requested ID not found')
       })
+  })
+  test("GET: 200 should include a comment_count of all the comments on the specified article_id", () => {
+    return request(app)
+    .get('/api/articles/1')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.article.comment_count).toBe(11)
+    })
   })
   test('PATCH: 200 should increment the votes of a specified article by the supplied amount', () => {
     const expectedArticle = {
