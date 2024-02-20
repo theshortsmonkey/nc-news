@@ -1,14 +1,18 @@
 const db = require('../db/connection.js')
 
-exports.selectArticles = (topic,sortBy = 'created_at') => {
-  const allowedOrderByVals = ['created_at','article_id','title','topic','author','votes']
-  if (!allowedOrderByVals.includes(sortBy)) {
+exports.selectArticles = (topic,sortBy = 'created_at',order='desc') => {
+  const allowedSortByVals = ['created_at','article_id','title','topic','author','votes']
+  if (!allowedSortByVals.includes(sortBy)) {
     return Promise.reject({status:400, customErrMsg: 'invalid sort column'})
+  }
+  const allowedOrderVals = ['asc','desc']
+  if (!allowedOrderVals.includes(order)) {
+    return Promise.reject({status:400, customErrMsg: 'invalid sort order'})
   }
   let queryString = `SELECT articles.article_id,articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url, CAST(COUNT(comment_id) AS INT) comment_count FROM articles
   LEFT OUTER JOIN comments ON articles.article_id = comments.article_id
   GROUP BY articles.article_id`
-  queryString += ` ORDER BY articles.${sortBy} DESC`
+  queryString += ` ORDER BY articles.${sortBy} ${order}`
 
   const queryVals = []
   if (topic) {

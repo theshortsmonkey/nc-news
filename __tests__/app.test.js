@@ -251,6 +251,22 @@ describe('/api/articles endpoint', () => {
       expect(body.msg).toEqual('invalid sort column')
     })
   })
+  test("GETL 200 uses order query to define the sort order of the supplied articles", () => {
+    return request(app)
+    .get('/api/articles?order=asc')
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.articles).toBeSortedBy('created_at', { descending: false })
+    })
+  })
+  test("GET: 400 when using a order query with an invalid direction", () => {
+    return request(app)
+    .get('/api/articles?order=none')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toEqual('invalid sort order')
+    })
+  })
 })
 describe('/api/articles/:article_id/comments endpoint', () => {
   test('GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id', () => {
