@@ -86,6 +86,82 @@ describe('/api/articles/:article_id endpoint', () => {
         expect(body.msg).toEqual('requested ID not found')
       })
   })
+  test("PATCH: 200 should increment the votes of a specified article by the supplied amount", () => {
+    const expectedArticle = {
+      article_id: 1,
+      title: 'Living in the shadow of a great man',
+      topic: 'mitch',
+      author: 'butter_bridge',
+      body: 'I find this existence challenging',
+      created_at: '2020-07-09T20:11:00.000Z',
+      votes: 105,
+      article_img_url:
+        'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+    }
+    return request(app)
+    .patch('/api/articles/1')
+    .send({inc_votes:5})
+    .expect(200)
+    .then(({body}) => {
+      expect(body.updatedArticle).toEqual(expectedArticle)
+    })
+  })
+  test("PATCH: 200 should increment the votes of a specified article by the supplied amount,ignoring unnessecary properties in requested body", () => {
+    const expectedArticle = {
+      article_id: 1,
+      title: 'Living in the shadow of a great man',
+      topic: 'mitch',
+      author: 'butter_bridge',
+      body: 'I find this existence challenging',
+      created_at: '2020-07-09T20:11:00.000Z',
+      votes: 105,
+      article_img_url:
+        'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+    }
+    return request(app)
+    .patch('/api/articles/1')
+    .send({inc_votes:5,article_id:'test'})
+    .expect(200)
+    .then(({body}) => {
+      expect(body.updatedArticle).toEqual(expectedArticle)
+    })
+  })
+  test('PATCH: 400 when attempting to update an article with an invalid id', () => {
+    return request(app)
+      .patch('/api/articles/cat')
+      .send({inc_votes:5})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid id supplied')
+      })
+  })
+  test("PATCH: 404 when attempting to udpate an article with an id that doesn't exist", () => {
+    return request(app)
+      .patch('/api/articles/99999')
+      .send({inc_votes:5})
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('requested ID not found')
+      })
+  })
+  test("PATCH: 400 when attempting to update an article with an invalid vote count", () => {
+    return request(app)
+      .patch('/api/articles/1')
+      .send({inc_votes:'cat'})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid vote increment supplied')
+      })
+  })
+  test("PATCH: 400 when attempting to update an article without an inc_votes value", () => {
+    return request(app)
+      .patch('/api/articles/1')
+      .send({inc_comments:5})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid vote increment supplied')
+      })
+  })
 })
 describe('/api/articles endpoint', () => {
   test('GET: 200 should return an array of all articles, all articles should have the following core properties: article_id,author,title,topic,created_at,votes,article_img_url', () => {
@@ -220,7 +296,7 @@ describe("/api/articles/:article_id/comments endpoint", () => {
   test("POST: 400 supplied username does not exist in database", () => {
     return request(app)
     .post('/api/articles/3/comments')
-    .send({username:'test',body:'test commnent'})
+    .send({username:'test',body:'test comment'})
     .expect(400)
     .then(({ body }) => {
       expect(body.msg).toEqual('supplied username does not exist in database')
