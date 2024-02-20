@@ -235,6 +235,22 @@ describe('/api/articles endpoint', () => {
       expect(body.msg).toEqual('topic does not exist in database')
     })
   })
+  test("GET: 200 uses sort_by query to sort the articles by valid column in descending order", () => {
+    return request(app)
+    .get('/api/articles?sort_by=votes')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles).toBeSortedBy('votes', { descending: true })
+    })
+  })
+  test("GET: 400 when using a sort_by query with an invalid column name", () => {
+    return request(app)
+    .get('/api/articles?sort_by=username')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toEqual('invalid sort column')
+    })
+  })
 })
 describe('/api/articles/:article_id/comments endpoint', () => {
   test('GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id', () => {

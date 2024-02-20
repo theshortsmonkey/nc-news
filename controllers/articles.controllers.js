@@ -2,8 +2,8 @@ const { selectArticleyById, selectArticles, selectCommentsByArticleId, insertCom
 const { selectTopicsBySlug } = require("../models/topics.models")
 
 exports.getArcticles = (req,res,next) => {
-  const {topic} = req.query
-  const promises = [selectArticles(topic)]
+  const {topic,sort_by} = req.query
+  const promises = [selectArticles(topic,sort_by)]
   if (topic) { promises.push(selectTopicsBySlug(topic))}
   return Promise.all(promises)
   .then((fulfilledPromises) => {
