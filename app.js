@@ -2,7 +2,7 @@ const express = require('express')
 const fs = require('fs/promises')
 const { getTopics } = require('./controllers/topics.controllers')
 const { handleServerErrors, handlePsqlErrors, handleCustomErrors } = require('./controllers/error.controllers')
-const { getArticleById, getArcticles, getArticleCommentsByArticleId, getCommentsByArticleId, postCommentByArticleId } = require('./controllers/articles.controllers')
+const { getArticleById, getArcticles, getArticleCommentsByArticleId, getCommentsByArticleId, postCommentByArticleId, patchArticleById } = require('./controllers/articles.controllers')
 
 app = express()
 
@@ -15,6 +15,7 @@ app.get('/api/articles/:article_id/comments',getCommentsByArticleId)
 
 app.use(express.json())
 app.post('/api/articles/:article_id/comments',postCommentByArticleId)
+app.patch('/api/articles/:article_id',patchArticleById)
 
 app.all('/*',handleMissingEndpoints)
 

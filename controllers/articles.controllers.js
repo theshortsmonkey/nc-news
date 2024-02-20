@@ -1,4 +1,4 @@
-const { selectArticleyById, selectArticles, selectCommentsByArticleId, insertCommentByArticleId } = require("../models/articles.models")
+const { selectArticleyById, selectArticles, selectCommentsByArticleId, insertCommentByArticleId, updateArticleById } = require("../models/articles.models")
 
 exports.getArcticles = (req,res,next) => {
   return selectArticles()
@@ -32,6 +32,17 @@ exports.postCommentByArticleId = (req,res,next) => {
   return insertCommentByArticleId(article_id,body)
   .then((postedComment) => {
     res.status(201).send({postedComment})
+  })
+  .catch(next)
+}
+
+exports.patchArticleById = (req,res,next) => {
+  const {article_id} = req.params
+  const promises = [updateArticleById(article_id,req.body),selectArticleyById(article_id)]
+
+  return Promise.all(promises).then((fulfilledPromises) => {
+    updatedArticle = fulfilledPromises[0]
+    res.status(200).send({updatedArticle})
   })
   .catch(next)
 }
