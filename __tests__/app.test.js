@@ -308,11 +308,11 @@ describe("/api/articles/:article_id/comments endpoint", () => {
       expect(body.msg).toEqual('body missing required field')
     })
   })
-  test("POST: 400 supplied username does not exist in database", () => {
+  test("POST: 404 supplied username does not exist in database", () => {
     return request(app)
     .post('/api/articles/3/comments')
     .send({username:'test',body:'test comment'})
-    .expect(400)
+    .expect(404)
     .then(({ body }) => {
       expect(body.msg).toEqual('supplied username does not exist in database')
     })
