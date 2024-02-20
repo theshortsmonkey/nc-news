@@ -1,20 +1,11 @@
 const express = require('express')
-const { getTopics } = require('./controllers/topics.controllers')
 const { handleServerErrors, handlePsqlErrors, handleCustomErrors } = require('./controllers/error.controllers')
-const { deleteCommentById } = require('./controllers/comments.controllers')
-const { getUsers } = require('./controllers/users.controllers')
 const apiRouter = require('./routes/api.router')
 
 app = express()
 app.use(express.json())
 
 app.use('/api',apiRouter)
-
-app.get('/api/topics',getTopics)
-
-app.get('/api/users',getUsers)
-
-app.delete('/api/comments/:comment_id',deleteCommentById)
 
 app.all('/*',handleMissingEndpoints)
 
