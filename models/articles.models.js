@@ -53,12 +53,6 @@ exports.insertCommentByArticleId = (article_id, comment) => {
       [username, body, article_id]
     )
     .then(({ rows }) => {
-      if (!rows.length) {
-        return Promise.reject({
-          status: 400,
-          customErrMsg: 'requested ID not found',
-        })
-      }
       return rows[0]
     })
 }

@@ -266,6 +266,21 @@ describe("/api/articles/:article_id/comments endpoint", () => {
       expect(typeof postedComment.created_at).toBe('string')
     })
   })
+  test("POST: 201 should return the posted comment,ignoring unnecessary properties in the suppied body", () => {
+    return request(app)
+    .post('/api/articles/3/comments')
+    .send({username:'butter_bridge', body: 'Gotta love a pug gif',article_id:8})
+    .expect(201)
+    .then(({body}) => {
+      const {postedComment} = body
+      expect(postedComment.author).toBe('butter_bridge')
+      expect(postedComment.body).toBe('Gotta love a pug gif')
+      expect(postedComment.article_id).toBe(3)
+      expect(postedComment.votes).toBe(0)
+      expect(postedComment.comment_id).toBe(19)
+      expect(typeof postedComment.created_at).toBe('string')
+    })
+  })
   test('POST: 400 when attempt to post a comment to an article using an invalid id', () => {
     return request(app)
       .post('/api/articles/cat/comments')
@@ -293,11 +308,11 @@ describe("/api/articles/:article_id/comments endpoint", () => {
       expect(body.msg).toEqual('body missing required field')
     })
   })
-  test("POST: 400 supplied username does not exist in database", () => {
+  test("POST: 404 supplied username does not exist in database", () => {
     return request(app)
     .post('/api/articles/3/comments')
     .send({username:'test',body:'test comment'})
-    .expect(400)
+    .expect(404)
     .then(({ body }) => {
       expect(body.msg).toEqual('supplied username does not exist in database')
     })

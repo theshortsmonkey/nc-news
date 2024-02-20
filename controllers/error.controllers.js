@@ -13,7 +13,7 @@ exports.handlePsqlErrors = (err, req, res, next) => {
       return res.status(400).send({ msg: 'body missing required field' })
     case '23503':
       if (err.constraint === 'comments_author_fkey') {
-        return res.status(400).send({msg: 'supplied username does not exist in database'})
+        return res.status(404).send({msg: 'supplied username does not exist in database'})
       }
       return res.status(404).send({ msg: 'requested ID not found' })
     default:
