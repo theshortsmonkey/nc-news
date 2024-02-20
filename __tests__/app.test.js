@@ -3,7 +3,6 @@ const request = require('supertest')
 const app = require('../app.js')
 const seed = require('../db/seeds/seed.js')
 const testData = require('../db/data/test-data/index')
-const fs = require('fs/promises')
 
 beforeEach(() => seed(testData))
 afterAll(() => db.end())
@@ -22,15 +21,9 @@ describe('routing issues', () => {
 })
 describe('/api endpoint', () => {
   test('GET: 200 should return an object describing all available endpoints', () => {
-    return fs
-      .readFile(`${__dirname}/../endpoints.json`, 'utf8')
-      .then((body) => {
-        const expected = JSON.parse(body)
-        return Promise.all([request(app).get('/api').expect(200), expected])
-      })
-      .then((res) => {
-        const { body } = res[0]
-        const expected = res[1]
+    const expected = require(`${__dirname}/../endpoints.json`)
+    return request(app).get('/api').expect(200)
+      .then(({body}) => {
         expect(body.endpoints).toEqual(expected)
       })
   })
