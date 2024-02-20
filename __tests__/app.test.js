@@ -348,3 +348,18 @@ describe('/api/comments/:comment_id endpoint', () => {
       })
   })
 })
+describe('/api/topics endpoint', () => {
+  test('GET: 200 should return an array of all users with username, name and avatar_url properties to the client', () => {
+    return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users).toHaveLength(4)
+        body.users.forEach((user) => {
+          expect(typeof user.username).toBe('string')
+          expect(typeof user.name).toBe('string')
+          expect(typeof user.avatar_url).toBe('string')
+        })
+      })
+  })
+})
