@@ -209,6 +209,30 @@ describe('/api/articles endpoint', () => {
         })
       })
   })
+  test("GET: 200 returned articles should be filtered by the specified topic in the supplied query", () => {
+    return request(app)
+    .get('/api/articles?topic=mitch')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles).toHaveLength(12)
+      body.articles.forEach((article) => {
+        expect(article.topic).toEqual('mitch')
+      })
+    })
+  })
+  test("GET 204 when supplied topic that has no articles associated with it", () => {
+    return request(app)
+    .get('/api/articles?topic=paper')
+    .expect(204)
+  })
+  test("GET: 404 when supplied a topic that doesn't exist", () => {
+    return request(app)
+    .get('/api/articles?topic=wood')
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toEqual('topic does not exist in database')
+    })
+  })
 })
 describe('/api/articles/:article_id/comments endpoint', () => {
   test('GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id', () => {
