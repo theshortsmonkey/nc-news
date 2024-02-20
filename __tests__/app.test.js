@@ -4,7 +4,6 @@ const app = require('../app.js')
 const seed = require('../db/seeds/seed.js')
 const testData = require('../db/data/test-data/index')
 const fs = require('fs/promises')
-const { convertTimestampToDate } = require('../db/seeds/utils.js')
 
 beforeEach(() => seed(testData))
 afterAll(() => db.end())
@@ -86,7 +85,7 @@ describe('/api/articles/:article_id endpoint', () => {
         expect(body.msg).toEqual('requested ID not found')
       })
   })
-  test("PATCH: 200 should increment the votes of a specified article by the supplied amount", () => {
+  test('PATCH: 200 should increment the votes of a specified article by the supplied amount', () => {
     const expectedArticle = {
       article_id: 1,
       title: 'Living in the shadow of a great man',
@@ -99,14 +98,14 @@ describe('/api/articles/:article_id endpoint', () => {
         'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
     }
     return request(app)
-    .patch('/api/articles/1')
-    .send({inc_votes:5})
-    .expect(200)
-    .then(({body}) => {
-      expect(body.updatedArticle).toEqual(expectedArticle)
-    })
+      .patch('/api/articles/1')
+      .send({ inc_votes: 5 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedArticle).toEqual(expectedArticle)
+      })
   })
-  test("PATCH: 200 should increment the votes of a specified article by the supplied amount,ignoring unnessecary properties in requested body", () => {
+  test('PATCH: 200 should increment the votes of a specified article by the supplied amount,ignoring unnessecary properties in requested body', () => {
     const expectedArticle = {
       article_id: 1,
       title: 'Living in the shadow of a great man',
@@ -119,17 +118,17 @@ describe('/api/articles/:article_id endpoint', () => {
         'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
     }
     return request(app)
-    .patch('/api/articles/1')
-    .send({inc_votes:5,article_id:'test'})
-    .expect(200)
-    .then(({body}) => {
-      expect(body.updatedArticle).toEqual(expectedArticle)
-    })
+      .patch('/api/articles/1')
+      .send({ inc_votes: 5, article_id: 'test' })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedArticle).toEqual(expectedArticle)
+      })
   })
   test('PATCH: 400 when attempting to update an article with an invalid id', () => {
     return request(app)
       .patch('/api/articles/cat')
-      .send({inc_votes:5})
+      .send({ inc_votes: 5 })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual('invalid id supplied')
@@ -138,25 +137,25 @@ describe('/api/articles/:article_id endpoint', () => {
   test("PATCH: 404 when attempting to udpate an article with an id that doesn't exist", () => {
     return request(app)
       .patch('/api/articles/99999')
-      .send({inc_votes:5})
+      .send({ inc_votes: 5 })
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toEqual('requested ID not found')
       })
   })
-  test("PATCH: 400 when attempting to update an article with an invalid vote count", () => {
+  test('PATCH: 400 when attempting to update an article with an invalid vote count', () => {
     return request(app)
       .patch('/api/articles/1')
-      .send({inc_votes:'cat'})
+      .send({ inc_votes: 'cat' })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual('invalid vote increment supplied')
       })
   })
-  test("PATCH: 400 when attempting to update an article without an inc_votes value", () => {
+  test('PATCH: 400 when attempting to update an article without an inc_votes value', () => {
     return request(app)
       .patch('/api/articles/1')
-      .send({inc_comments:5})
+      .send({ inc_comments: 5 })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual('invalid vote increment supplied')
@@ -211,29 +210,30 @@ describe('/api/articles endpoint', () => {
       })
   })
 })
-describe("/api/articles/:article_id/comments endpoint", () => {
-  test("GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id", () => {
+describe('/api/articles/:article_id/comments endpoint', () => {
+  test('GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id', () => {
     return request(app)
-    .get('/api/articles/3/comments')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.comments).toHaveLength(2)
-      body.comments.forEach((comment) => {
-        expect(typeof comment.comment_id).toBe('number')
-        expect(typeof comment.votes).toBe('number')
-        expect(typeof comment.created_at).toBe('string')
-        expect(typeof comment.author).toBe('string')
-        expect(typeof comment.body).toBe('string')
-        expect(typeof comment.article_id).toBe('number')
+      .get('/api/articles/3/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toHaveLength(2)
+        body.comments.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe('number')
+          expect(typeof comment.votes).toBe('number')
+          expect(typeof comment.created_at).toBe('string')
+          expect(typeof comment.author).toBe('string')
+          expect(typeof comment.body).toBe('string')
+          expect(typeof comment.article_id).toBe('number')
+        })
       })
-    })
   })
-  test("GET: 200 returned comments should be sorted by most recent first", () => {return request(app)
-    .get('/api/articles/3/comments')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.comments).toBeSortedBy('created_at',{descending: true})
-    })
+  test('GET: 200 returned comments should be sorted by most recent first', () => {
+    return request(app)
+      .get('/api/articles/3/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeSortedBy('created_at', { descending: true })
+      })
   })
   test('GET: 400 when requesting comments from an article using an invalid id', () => {
     return request(app)
@@ -251,40 +251,44 @@ describe("/api/articles/:article_id/comments endpoint", () => {
         expect(body.msg).toEqual('requested ID not found')
       })
   })
-  test("POST: 201 should return the posted comment", () => {
+  test('POST: 201 should return the posted comment', () => {
     return request(app)
-    .post('/api/articles/3/comments')
-    .send({username:'butter_bridge', body: 'Gotta love a pug gif'})
-    .expect(201)
-    .then(({body}) => {
-      const {postedComment} = body
-      expect(postedComment.author).toBe('butter_bridge')
-      expect(postedComment.body).toBe('Gotta love a pug gif')
-      expect(postedComment.article_id).toBe(3)
-      expect(postedComment.votes).toBe(0)
-      expect(postedComment.comment_id).toBe(19)
-      expect(typeof postedComment.created_at).toBe('string')
-    })
+      .post('/api/articles/3/comments')
+      .send({ username: 'butter_bridge', body: 'Gotta love a pug gif' })
+      .expect(201)
+      .then(({ body }) => {
+        const { postedComment } = body
+        expect(postedComment.author).toBe('butter_bridge')
+        expect(postedComment.body).toBe('Gotta love a pug gif')
+        expect(postedComment.article_id).toBe(3)
+        expect(postedComment.votes).toBe(0)
+        expect(postedComment.comment_id).toBe(19)
+        expect(typeof postedComment.created_at).toBe('string')
+      })
   })
-  test("POST: 201 should return the posted comment,ignoring unnecessary properties in the suppied body", () => {
+  test('POST: 201 should return the posted comment,ignoring unnecessary properties in the suppied body', () => {
     return request(app)
-    .post('/api/articles/3/comments')
-    .send({username:'butter_bridge', body: 'Gotta love a pug gif',article_id:8})
-    .expect(201)
-    .then(({body}) => {
-      const {postedComment} = body
-      expect(postedComment.author).toBe('butter_bridge')
-      expect(postedComment.body).toBe('Gotta love a pug gif')
-      expect(postedComment.article_id).toBe(3)
-      expect(postedComment.votes).toBe(0)
-      expect(postedComment.comment_id).toBe(19)
-      expect(typeof postedComment.created_at).toBe('string')
-    })
+      .post('/api/articles/3/comments')
+      .send({
+        username: 'butter_bridge',
+        body: 'Gotta love a pug gif',
+        article_id: 8,
+      })
+      .expect(201)
+      .then(({ body }) => {
+        const { postedComment } = body
+        expect(postedComment.author).toBe('butter_bridge')
+        expect(postedComment.body).toBe('Gotta love a pug gif')
+        expect(postedComment.article_id).toBe(3)
+        expect(postedComment.votes).toBe(0)
+        expect(postedComment.comment_id).toBe(19)
+        expect(typeof postedComment.created_at).toBe('string')
+      })
   })
   test('POST: 400 when attempt to post a comment to an article using an invalid id', () => {
     return request(app)
       .post('/api/articles/cat/comments')
-      .send({username:'butter_bridge', body: 'Gotta love a pug gif'})
+      .send({ username: 'butter_bridge', body: 'Gotta love a pug gif' })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual('invalid id supplied')
@@ -293,28 +297,54 @@ describe("/api/articles/:article_id/comments endpoint", () => {
   test("POST: 404 when attempt to post a comment to an article with an id that doesn't exist", () => {
     return request(app)
       .post('/api/articles/99999/comments')
-      .send({username:'butter_bridge', body: 'Gotta love a pug gif'})
+      .send({ username: 'butter_bridge', body: 'Gotta love a pug gif' })
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toEqual('requested ID not found')
       })
   })
-  test("POST: 400 malformed body/missing required field", () => {
+  test('POST: 400 malformed body/missing required field', () => {
     return request(app)
-    .post('/api/articles/3/comments')
-    .send({username:'butter_bridge'})
-    .expect(400)
-    .then(({ body }) => {
-      expect(body.msg).toEqual('body missing required field')
-    })
+      .post('/api/articles/3/comments')
+      .send({ username: 'butter_bridge' })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('body missing required field')
+      })
   })
-  test("POST: 404 supplied username does not exist in database", () => {
+  test('POST: 404 supplied username does not exist in database', () => {
     return request(app)
-    .post('/api/articles/3/comments')
-    .send({username:'test',body:'test comment'})
-    .expect(404)
-    .then(({ body }) => {
-      expect(body.msg).toEqual('supplied username does not exist in database')
-    })
+      .post('/api/articles/3/comments')
+      .send({ username: 'test', body: 'test comment' })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('supplied username does not exist in database')
+      })
+  })
+})
+describe('/api/comments/:comment_id endpoint', () => {
+  test('DELETE: 204 with no content when successfully deleting comment with supplied id', () => {
+    return request(app)
+      .delete('/api/comments/1')
+      .expect(204)
+      .then((res) => {
+        expect(res.body).toEqual({})
+      })
+  })
+  test('DELETE: 400 when attempting to delete an article with an invalid id', () => {
+    return request(app)
+      .delete('/api/comments/cat')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid id supplied')
+      })
+  })
+  test("DELETE: 404 when attempting to udpate an article with an id that doesn't exist", () => {
+    return request(app)
+      .delete('/api/comments/99999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('requested ID not found')
+      })
   })
 })
