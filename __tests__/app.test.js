@@ -235,6 +235,51 @@ describe('/api/articles endpoint', () => {
       expect(body.msg).toEqual('topic does not exist in database')
     })
   })
+  test("GET: 200 uses sort_by query to sort the articles by valid column in descending order", () => {
+    return request(app)
+    .get('/api/articles?sort_by=votes')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles).toBeSortedBy('votes', { descending: true })
+    })
+  })
+  test("GET: 400 when using a sort_by query with an invalid column name", () => {
+    return request(app)
+    .get('/api/articles?sort_by=username')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toEqual('invalid sort column')
+    })
+  })
+  test("GET: 200 uses order query to define the sort order of the supplied articles", () => {
+    return request(app)
+    .get('/api/articles?order=asc')
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.articles).toBeSortedBy('created_at', { descending: false })
+    })
+  })
+  test("GET: 400 when using a order query with an invalid direction", () => {
+    return request(app)
+    .get('/api/articles?order=none')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toEqual('invalid sort order')
+    })
+  })
+  test("GET: 200 multiple valid queries processed correctly", () => {
+    return request(app)
+    .get('/api/articles?sort_by=author&order=asc&topic=mitch')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles).toHaveLength(12)
+      body.articles.forEach((article) => {
+        expect(article.topic).toBe('mitch')
+      })
+      expect(body.articles).toBeSortedBy('author', { descending: false })
+    })
+
+  })
 })
 describe('/api/articles/:article_id/comments endpoint', () => {
   test('GET: 200 should return an array of all comments for the supplied article id. Each comment should have properties: comment_id,votes,created_at,author,body & article_id', () => {
