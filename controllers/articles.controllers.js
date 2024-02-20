@@ -31,8 +31,10 @@ exports.getCommentsByArticleId = (req,res,next) => {
 exports.postCommentByArticleId = (req,res,next) => {
   const {article_id} = req.params
   const {body} = req
-  return insertCommentByArticleId(article_id,body)
-  .then((postedComment) => {
+  const promises = [insertCommentByArticleId(article_id,body),selectArticleyById(article_id)]
+  return Promise.all(promises)
+  .then((fulfilledPromises) => {
+    postedComment = fulfilledPromises[0]
     res.status(201).send({postedComment})
   })
   .catch(next)
