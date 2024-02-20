@@ -251,7 +251,7 @@ describe('/api/articles endpoint', () => {
       expect(body.msg).toEqual('invalid sort column')
     })
   })
-  test("GETL 200 uses order query to define the sort order of the supplied articles", () => {
+  test("GET: 200 uses order query to define the sort order of the supplied articles", () => {
     return request(app)
     .get('/api/articles?order=asc')
     .expect(200)
@@ -266,6 +266,19 @@ describe('/api/articles endpoint', () => {
     .then(({body}) => {
       expect(body.msg).toEqual('invalid sort order')
     })
+  })
+  test("GET: 200 multiple valid queries processed correctly", () => {
+    return request(app)
+    .get('/api/articles?sort_by=author&order=asc&topic=mitch')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles).toHaveLength(12)
+      body.articles.forEach((article) => {
+        expect(article.topic).toBe('mitch')
+      })
+      expect(body.articles).toBeSortedBy('author', { descending: false })
+    })
+
   })
 })
 describe('/api/articles/:article_id/comments endpoint', () => {
