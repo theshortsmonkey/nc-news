@@ -17,12 +17,17 @@ exports.selectArticles = (topic) => {
 }
 
 exports.selectArticleyById = (id) => {
+  const baseString = `
+  SELECT articles.*, CAST(COUNT(comment_id) AS INT) comment_count 
+  FROM articles
+  LEFT OUTER JOIN comments 
+  ON articles.article_id = comments.article_id
+  GROUP BY articles.article_id`
+  const queryString = `SELECT * FROM (` + baseString + `) a 
+  WHERE article_id = $1`
+  const queryVals = [id]
   return db
-    .query(
-      `SELECT * FROM articles
-  WHERE article_id = $1`,
-      [id]
-    )
+    .query(queryString,queryVals)
     .then(({ rows }) => {
       if (!rows.length) {
         return Promise.reject({
