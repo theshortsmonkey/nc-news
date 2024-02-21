@@ -417,6 +417,90 @@ describe('/api/comments/:comment_id endpoint', () => {
         expect(body.msg).toEqual('requested ID not found')
       })
   })
+  test('PATCH: 200 should increment the votes of a specified comment by the supplied amount', () => {
+    return request(app)
+    .patch('/api/comments/1')
+    .send({ inc_votes : 4 })
+    .expect(200)
+    .then(({body}) => {
+      expect(body.updatedComment).toMatchObject({
+        comment_id: 1,
+        body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        article_id: 9,
+        author: 'butter_bridge',
+        votes:20,
+        created_at: '2020-04-06T12:17:00.000Z'
+      })
+    })
+  })
+  test('PATCH: 200 should decrement the votes of a specified comment by the supplied amount', () => {
+    return request(app)
+    .patch('/api/comments/1')
+    .send({ inc_votes : -6 })
+    .expect(200)
+    .then(({body}) => {
+      expect(body.updatedComment).toMatchObject({
+        comment_id: 1,
+        body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        article_id: 9,
+        author: 'butter_bridge',
+        votes:10,
+        created_at: '2020-04-06T12:17:00.000Z'
+      })
+    })
+  })
+  test('PATCH: 200 should increment the votes of a specified comment by the supplied amount,ignoring unnessecary properties in requested body', () => {
+    return request(app)
+    .patch('/api/comments/1')
+    .send({ inc_votes : 4, article_id: 10 })
+    .expect(200)
+    .then(({body}) => {
+      expect(body.updatedComment).toMatchObject({
+        comment_id: 1,
+        body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        article_id: 9,
+        author: 'butter_bridge',
+        votes:20,
+        created_at: '2020-04-06T12:17:00.000Z'
+      })
+    })
+  })
+  test('PATCH: 400 when attempting to update a comment with an invalid id', () => {
+    return request(app)
+    .patch('/api/comments/cat')
+    .send({ inc_votes : 4 })
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid id supplied')
+    })
+  })
+  test("PATCH: 404 when attempting to udpate a comment with an id that doesn't exist", () => {
+    return request(app)
+    .patch('/api/comments/99999')
+    .send({ inc_votes : 4 })
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe('requested ID not found')
+    })
+  })
+  test('PATCH: 400 when attempting to update a comment with an invalid vote count', () => {
+    return request(app)
+    .patch('/api/comments/1')
+    .send({ inc_votes : 'cat' })
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid vote increment supplied')
+    })
+  })
+  test('PATCH: 400 when attempting to update a comment without an inc_votes value', () => {
+    return request(app)
+    .patch('/api/comments/1')
+    .send({ inc_article_id : 4 })
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid vote increment supplied')
+    })
+  })
 })
 describe('/api/users endpoint', () => {
   test('GET: 200 should return an array of all users with username, name and avatar_url properties to the client', () => {
