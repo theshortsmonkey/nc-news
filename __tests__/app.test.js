@@ -59,8 +59,7 @@ describe('/api/articles/:article_id endpoint', () => {
       .get('/api/articles/1')
       .expect(200)
       .then(({ body }) => {
-        const {comment_count,...article} = body.article
-        expect(article).toEqual(expectedArticle)
+        expect(body.article).toMatchObject(expectedArticle)
       })
   })
   test('GET: 400 when requesting an article with an invalid id', () => {
@@ -419,7 +418,7 @@ describe('/api/comments/:comment_id endpoint', () => {
       })
   })
 })
-describe('/api/topics endpoint', () => {
+describe('/api/users endpoint', () => {
   test('GET: 200 should return an array of all users with username, name and avatar_url properties to the client', () => {
     return request(app)
       .get('/api/users')
@@ -431,6 +430,28 @@ describe('/api/topics endpoint', () => {
           expect(typeof user.name).toBe('string')
           expect(typeof user.avatar_url).toBe('string')
         })
+      })
+  })
+})
+describe("/api/users/:username endpoint", () => {
+  test("GET: 200 should a user with username, avatar_url and name properties", () => {
+    return request(app)
+    .get('/api/users/butter_bridge')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.user).toMatchObject({
+        username: 'butter_bridge',
+        avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+        name: 'jonny'
+      })
+    })
+  })
+  test("GET: 404 when requesting a user with an username that doesn't exist", () => {
+    return request(app)
+      .get('/api/users/mitch')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('requested username not found')
       })
   })
 })
