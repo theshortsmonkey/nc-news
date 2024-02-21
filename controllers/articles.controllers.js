@@ -1,11 +1,13 @@
 const {
   selectArticleyById,
   selectArticles,
-  selectCommentsByArticleId,
-  insertCommentByArticleId,
   updateArticleById,
   insertArticle,
 } = require('../models/articles.models')
+const {
+  selectCommentsByArticleId,
+  insertCommentByArticleId,
+} = require('../models/comments.models')
 const { selectTopicsBySlug } = require('../models/topics.models')
 
 exports.getArcticles = (req, res, next) => {
@@ -79,10 +81,12 @@ exports.patchArticleById = (req, res, next) => {
 }
 
 exports.postArticle = (req, res, next) => {
-  return insertArticle(req.body).then((postedArticleId) => {
-    return selectArticleyById(postedArticleId)
-  }).then((postedArticle) => {
-    res.status(201).send({postedArticle})
-  }) 
-  .catch(next)
+  return insertArticle(req.body)
+    .then((postedArticleId) => {
+      return selectArticleyById(postedArticleId)
+    })
+    .then((postedArticle) => {
+      res.status(201).send({ postedArticle })
+    })
+    .catch(next)
 }
