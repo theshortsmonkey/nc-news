@@ -165,13 +165,13 @@ describe('/api/articles/:article_id endpoint', () => {
       })
   })
 })
-describe('GET /api/articles endpoint', () => {
+describe.only('GET /api/articles endpoint', () => {
   test('GET: 200 should return an array of all articles, all articles should have the following core properties: article_id,author,title,topic,created_at,votes,article_img_url', () => {
     return request(app)
       .get('/api/articles')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toHaveLength(13)
+        expect(body.articles).toHaveLength(10)
         body.articles.forEach((article) => {
           expect(typeof article.article_id).toBe('number')
           expect(typeof article.author).toBe('string')
@@ -217,7 +217,7 @@ describe('GET /api/articles endpoint', () => {
       .get('/api/articles?topic=mitch')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toHaveLength(12)
+        expect(body.articles).toHaveLength(10)
         body.articles.forEach((article) => {
           expect(article.topic).toEqual('mitch')
         })
@@ -271,12 +271,63 @@ describe('GET /api/articles endpoint', () => {
       .get('/api/articles?sort_by=author&order=asc&topic=mitch')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toHaveLength(12)
+        expect(body.articles).toHaveLength(10)
         body.articles.forEach((article) => {
           expect(article.topic).toBe('mitch')
         })
         expect(body.articles).toBeSortedBy('author', { descending: false })
       })
+  })
+  test("GET: 200 uses limit query to limit the number of articles returned", () => {
+    return request(app)
+    .get('/api/articles?limit=5')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles.length).toBe(5)
+    })
+  })
+  test("GET: 200 limit query should default to returning 10 articles", () => {
+    return request(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles.length).toBe(10)
+    })
+  })
+  test("GET: 200 'p' query should offset the returned articles from the top of the full list, based on default the limit value", () => {
+    return request(app)
+    .get('/api/articles?p=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles.length).toBe(3)
+      expect(body.articles[0].article_id).toBe(8)
+    })
+  })
+  test("GET: 200 'p' query should offset the returned articles from the top of the full list, based on the supplied limit value", () => {
+    return request(app)
+    .get('/api/articles?p=2&limit=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles.length).toBe(2)
+      expect(body.articles[0].article_id).toBe(2)
+      expect(body.articles[1].article_id).toBe(13)
+    })
+  })
+  test("GET: 200 returned object has a total_count property set to the total number of articles, discounting the limit", () => {
+    return request(app)
+    .get('/api/articles?p=2&limit=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.total_count).toBe(13)
+    })
+  })
+  test("GET: 200 returned object has a total_count property set to the total number of articles, with the supplied filter applied", () => {
+    return request(app)
+    .get('/api/articles?p=2&limit=2&topic=mitch')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.total_count).toBe(12)
+    })
   })
 })
 describe("'POST /api/articles endpoint", () => {
