@@ -5,7 +5,7 @@ exports.selectArticles = (
   sortBy = 'created_at',
   order = 'desc',
   limit = 10,
-  p = 1
+  p = 0
 ) => {
   const allowedSortByVals = [
     'created_at',
@@ -28,7 +28,7 @@ exports.selectArticles = (
   LEFT OUTER JOIN comments ON articles.article_id = comments.article_id
   GROUP BY articles.article_id 
   ORDER BY articles.${sortBy} ${order}`
-  
+
   const countQueryVals = []
   const queryVals = []
   if (topic) {
@@ -41,20 +41,21 @@ exports.selectArticles = (
     countQueryString += ` WHERE topic = $1`
     countQueryVals.push(topic)
   }
-  queryVals.push(limit)
-  queryString += ` LIMIT $${queryVals.length}`
   const listPos = p - 1
   const offset = listPos * limit
-  queryVals.push(offset)
-  queryString += ` OFFSET $${queryVals.length}`
-
+  if (offset >= 0) {
+    queryVals.push(limit)
+    queryString += ` LIMIT $${queryVals.length}`
+    queryVals.push(offset)
+    queryString += ` OFFSET $${queryVals.length}`
+  }
   return Promise.all([
     db.query(countQueryString, countQueryVals),
     db.query(queryString, queryVals),
   ]).then((fulfilledPromises) => {
-    const {count} = fulfilledPromises[0].rows[0]
-    const {rows} = fulfilledPromises[1]
-    return {total_count:count,articles:rows}
+    const { count } = fulfilledPromises[0].rows[0]
+    const { rows } = fulfilledPromises[1]
+    return { total_count: count, articles: rows }
   })
 }
 

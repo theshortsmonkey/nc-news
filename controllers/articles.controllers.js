@@ -11,7 +11,9 @@ const {
 const { selectTopicsBySlug } = require('../models/topics.models')
 
 exports.getArcticles = (req, res, next) => {
-  const { topic, sort_by, order, limit, p } = req.query
+  const { topic, sort_by, order, limit} = req.query
+  let {p} = req.query
+  if (limit && !p) { p = 1}
   const promises = [selectArticles(topic, sort_by, order, limit, p)]
   if (topic) {
     promises.push(selectTopicsBySlug(topic))

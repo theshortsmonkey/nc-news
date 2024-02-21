@@ -171,7 +171,7 @@ describe.only('GET /api/articles endpoint', () => {
       .get('/api/articles')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toHaveLength(10)
+        expect(body.articles).toHaveLength(13)
         body.articles.forEach((article) => {
           expect(typeof article.article_id).toBe('number')
           expect(typeof article.author).toBe('string')
@@ -217,7 +217,7 @@ describe.only('GET /api/articles endpoint', () => {
       .get('/api/articles?topic=mitch')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toHaveLength(10)
+        expect(body.articles).toHaveLength(12)
         body.articles.forEach((article) => {
           expect(article.topic).toEqual('mitch')
         })
@@ -271,7 +271,7 @@ describe.only('GET /api/articles endpoint', () => {
       .get('/api/articles?sort_by=author&order=asc&topic=mitch')
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toHaveLength(10)
+        expect(body.articles).toHaveLength(12)
         body.articles.forEach((article) => {
           expect(article.topic).toBe('mitch')
         })
@@ -286,15 +286,7 @@ describe.only('GET /api/articles endpoint', () => {
       expect(body.articles.length).toBe(5)
     })
   })
-  test("GET: 200 limit query should default to returning 10 articles", () => {
-    return request(app)
-    .get('/api/articles')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.articles.length).toBe(10)
-    })
-  })
-  test("GET: 200 'p' query should offset the returned articles from the top of the full list, based on default the limit value", () => {
+  test("GET: 200 'p' query should offset the returned articles from the top of the full list, based on default the limit value(10)", () => {
     return request(app)
     .get('/api/articles?p=2')
     .expect(200)
@@ -329,6 +321,8 @@ describe.only('GET /api/articles endpoint', () => {
       expect(body.total_count).toBe(12)
     })
   })
+  test.todo('GET: 400 when requesting a limit with an invalid value')
+  test.todo('GET: 400 when requesting a page with an invalid value')
 })
 describe("'POST /api/articles endpoint", () => {
   test('POST: 201 should return the posted article', () => {
