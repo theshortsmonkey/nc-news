@@ -21,7 +21,7 @@ exports.updateCommentById = (commentId,votesInc) => {
   return db.query(`UPDATE comments
   SET votes = votes + $1
   WHERE comment_id = $2 
-  RETURNING *;`,
+  RETURNING comments.*, TO_CHAR(comments.created_at,'YYYY-MM-DD HH24:MI:SS') created_at;`,
       [votesInc, commentId]
     )
     .then(({ rows }) => {
