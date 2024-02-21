@@ -22,8 +22,10 @@ describe('routing issues', () => {
 describe('/api endpoint', () => {
   test('GET: 200 should return an object describing all available endpoints', () => {
     const expected = require(`${__dirname}/../endpoints.json`)
-    return request(app).get('/api').expect(200)
-      .then(({body}) => {
+    return request(app)
+      .get('/api')
+      .expect(200)
+      .then(({ body }) => {
         expect(body.endpoints).toEqual(expected)
       })
   })
@@ -50,7 +52,7 @@ describe('/api/articles/:article_id endpoint', () => {
       topic: 'mitch',
       author: 'butter_bridge',
       body: 'I find this existence challenging',
-      created_at: '2020-07-09T20:11:00.000Z',
+      created_at: '2020-07-09 21:11:00',
       votes: 100,
       article_img_url:
         'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
@@ -78,13 +80,13 @@ describe('/api/articles/:article_id endpoint', () => {
         expect(body.msg).toEqual('requested ID not found')
       })
   })
-  test("GET: 200 should include a comment_count of all the comments on the specified article_id", () => {
+  test('GET: 200 should include a comment_count of all the comments on the specified article_id', () => {
     return request(app)
-    .get('/api/articles/1')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.article.comment_count).toBe(11)
-    })
+      .get('/api/articles/1')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article.comment_count).toBe(11)
+      })
   })
   test('PATCH: 200 should increment the votes of a specified article by the supplied amount', () => {
     const expectedArticle = {
@@ -93,7 +95,7 @@ describe('/api/articles/:article_id endpoint', () => {
       topic: 'mitch',
       author: 'butter_bridge',
       body: 'I find this existence challenging',
-      created_at: '2020-07-09T20:11:00.000Z',
+      created_at: '2020-07-09 21:11:00',
       votes: 105,
       article_img_url:
         'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
@@ -113,7 +115,7 @@ describe('/api/articles/:article_id endpoint', () => {
       topic: 'mitch',
       author: 'butter_bridge',
       body: 'I find this existence challenging',
-      created_at: '2020-07-09T20:11:00.000Z',
+      created_at: '2020-07-09 21:11:00',
       votes: 105,
       article_img_url:
         'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
@@ -163,7 +165,7 @@ describe('/api/articles/:article_id endpoint', () => {
       })
   })
 })
-describe('/api/articles endpoint', () => {
+describe('GET /api/articles endpoint', () => {
   test('GET: 200 should return an array of all articles, all articles should have the following core properties: article_id,author,title,topic,created_at,votes,article_img_url', () => {
     return request(app)
       .get('/api/articles')
@@ -210,74 +212,166 @@ describe('/api/articles endpoint', () => {
         })
       })
   })
-  test("GET: 200 returned articles should be filtered by the specified topic in the supplied query", () => {
+  test('GET: 200 returned articles should be filtered by the specified topic in the supplied query', () => {
     return request(app)
-    .get('/api/articles?topic=mitch')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.articles).toHaveLength(12)
-      body.articles.forEach((article) => {
-        expect(article.topic).toEqual('mitch')
+      .get('/api/articles?topic=mitch')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toHaveLength(12)
+        body.articles.forEach((article) => {
+          expect(article.topic).toEqual('mitch')
+        })
       })
-    })
   })
-  test("GET 204 when supplied topic that has no articles associated with it", () => {
-    return request(app)
-    .get('/api/articles?topic=paper')
-    .expect(204)
+  test('GET 204 when supplied topic that has no articles associated with it', () => {
+    return request(app).get('/api/articles?topic=paper').expect(204)
   })
   test("GET: 404 when supplied a topic that doesn't exist", () => {
     return request(app)
-    .get('/api/articles?topic=wood')
-    .expect(404)
-    .then(({body}) => {
-      expect(body.msg).toEqual('topic does not exist in database')
-    })
-  })
-  test("GET: 200 uses sort_by query to sort the articles by valid column in descending order", () => {
-    return request(app)
-    .get('/api/articles?sort_by=votes')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.articles).toBeSortedBy('votes', { descending: true })
-    })
-  })
-  test("GET: 400 when using a sort_by query with an invalid column name", () => {
-    return request(app)
-    .get('/api/articles?sort_by=username')
-    .expect(400)
-    .then(({body}) => {
-      expect(body.msg).toEqual('invalid sort column')
-    })
-  })
-  test("GET: 200 uses order query to define the sort order of the supplied articles", () => {
-    return request(app)
-    .get('/api/articles?order=asc')
-    .expect(200)
-    .then(({ body }) => {
-      expect(body.articles).toBeSortedBy('created_at', { descending: false })
-    })
-  })
-  test("GET: 400 when using a order query with an invalid direction", () => {
-    return request(app)
-    .get('/api/articles?order=none')
-    .expect(400)
-    .then(({body}) => {
-      expect(body.msg).toEqual('invalid sort order')
-    })
-  })
-  test("GET: 200 multiple valid queries processed correctly", () => {
-    return request(app)
-    .get('/api/articles?sort_by=author&order=asc&topic=mitch')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.articles).toHaveLength(12)
-      body.articles.forEach((article) => {
-        expect(article.topic).toBe('mitch')
+      .get('/api/articles?topic=wood')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('topic does not exist in database')
       })
-      expect(body.articles).toBeSortedBy('author', { descending: false })
-    })
-
+  })
+  test('GET: 200 uses sort_by query to sort the articles by valid column in descending order', () => {
+    return request(app)
+      .get('/api/articles?sort_by=votes')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('votes', { descending: true })
+      })
+  })
+  test('GET: 400 when using a sort_by query with an invalid column name', () => {
+    return request(app)
+      .get('/api/articles?sort_by=username')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid sort column')
+      })
+  })
+  test('GET: 200 uses order query to define the sort order of the supplied articles', () => {
+    return request(app)
+      .get('/api/articles?order=asc')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('created_at', { descending: false })
+      })
+  })
+  test('GET: 400 when using a order query with an invalid direction', () => {
+    return request(app)
+      .get('/api/articles?order=none')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid sort order')
+      })
+  })
+  test('GET: 200 multiple valid queries processed correctly', () => {
+    return request(app)
+      .get('/api/articles?sort_by=author&order=asc&topic=mitch')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toHaveLength(12)
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe('mitch')
+        })
+        expect(body.articles).toBeSortedBy('author', { descending: false })
+      })
+  })
+})
+describe("'POST /api/articles endpoint", () => {
+  test('POST: 201 should return the posted article', () => {
+    return request(app)
+      .post('/api/articles/')
+      .send({
+        author: 'butter_bridge',
+        title: 'Yet another article about pugs',
+        body: 'Gotta love those squished little faces',
+        topic: 'cats',
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.postedArticle).toMatchObject({
+          author: 'butter_bridge',
+          title: 'Yet another article about pugs',
+          body: 'Gotta love those squished little faces',
+          topic: 'cats',
+          article_img_url:
+            'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700',
+          article_id: 14,
+          votes: 0,
+          created_at: expect.any(String),
+          comment_count: 0,
+        })
+      })
+  })
+  test('POST: 201 should return the posted article,ignoring unnecessary properties in the suppied body', () => {
+    return request(app)
+      .post('/api/articles/')
+      .send({
+        author: 'butter_bridge',
+        title: 'Yet another article about pugs',
+        body: 'Gotta love those squished little faces',
+        topic: 'cats',
+        type: 'hello',
+        extras: 'should be skipped',
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.postedArticle).toMatchObject({
+          author: 'butter_bridge',
+          title: 'Yet another article about pugs',
+          body: 'Gotta love those squished little faces',
+          topic: 'cats',
+          article_img_url:
+            'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700',
+          article_id: 14,
+          votes: 0,
+          created_at: expect.any(String),
+          comment_count: 0,
+        })
+      })
+  })
+  test('POST: 400 malformed body/missing required field', () => {
+    return request(app)
+      .post('/api/articles')
+      .send({
+        author: 'butter_bridge',
+        title: 'Yet another article about pugs',
+        body: 'Gotta love those squished little faces',
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('body missing required field: "topic"')
+      })
+  })
+  test('POST: 404 supplied username does not exist in database', () => {
+    return request(app)
+      .post('/api/articles/')
+      .send({
+        author: 'unknown',
+        title: 'Yet another article about pugs',
+        body: 'Gotta love those squished little faces',
+        topic: 'cats',
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('supplied username does not exist in database')
+      })
+  })
+  test('POST: 404 supplied topic does not exist in database', () => {
+    return request(app)
+      .post('/api/articles/')
+      .send({
+        author: 'butter_bridge',
+        title: 'Yet another article about pugs',
+        body: 'Gotta love those squished little faces',
+        topic: 'dogs',
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('supplied topic does not exist in database')
+      })
   })
 })
 describe('/api/articles/:article_id/comments endpoint', () => {
@@ -379,7 +473,7 @@ describe('/api/articles/:article_id/comments endpoint', () => {
       .send({ username: 'butter_bridge' })
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toEqual('body missing required field')
+        expect(body.msg).toEqual('body missing required field: "body"')
       })
   })
   test('POST: 404 supplied username does not exist in database', () => {
@@ -419,87 +513,87 @@ describe('/api/comments/:comment_id endpoint', () => {
   })
   test('PATCH: 200 should increment the votes of a specified comment by the supplied amount', () => {
     return request(app)
-    .patch('/api/comments/1')
-    .send({ inc_votes : 4 })
-    .expect(200)
-    .then(({body}) => {
-      expect(body.updatedComment).toMatchObject({
-        comment_id: 1,
-        body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-        article_id: 9,
-        author: 'butter_bridge',
-        votes:20,
-        created_at: '2020-04-06T12:17:00.000Z'
+      .patch('/api/comments/1')
+      .send({ inc_votes: 4 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedComment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          article_id: 9,
+          author: 'butter_bridge',
+          votes: 20,
+          created_at: '2020-04-06 13:17:00',
+        })
       })
-    })
   })
   test('PATCH: 200 should decrement the votes of a specified comment by the supplied amount', () => {
     return request(app)
-    .patch('/api/comments/1')
-    .send({ inc_votes : -6 })
-    .expect(200)
-    .then(({body}) => {
-      expect(body.updatedComment).toMatchObject({
-        comment_id: 1,
-        body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-        article_id: 9,
-        author: 'butter_bridge',
-        votes:10,
-        created_at: '2020-04-06T12:17:00.000Z'
+      .patch('/api/comments/1')
+      .send({ inc_votes: -6 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedComment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          article_id: 9,
+          author: 'butter_bridge',
+          votes: 10,
+          created_at: '2020-04-06 13:17:00',
+        })
       })
-    })
   })
   test('PATCH: 200 should increment the votes of a specified comment by the supplied amount,ignoring unnessecary properties in requested body', () => {
     return request(app)
-    .patch('/api/comments/1')
-    .send({ inc_votes : 4, article_id: 10 })
-    .expect(200)
-    .then(({body}) => {
-      expect(body.updatedComment).toMatchObject({
-        comment_id: 1,
-        body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-        article_id: 9,
-        author: 'butter_bridge',
-        votes:20,
-        created_at: '2020-04-06T12:17:00.000Z'
+      .patch('/api/comments/1')
+      .send({ inc_votes: 4, article_id: 10 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedComment).toMatchObject({
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          article_id: 9,
+          author: 'butter_bridge',
+          votes: 20,
+          created_at: '2020-04-06 13:17:00',
+        })
       })
-    })
   })
   test('PATCH: 400 when attempting to update a comment with an invalid id', () => {
     return request(app)
-    .patch('/api/comments/cat')
-    .send({ inc_votes : 4 })
-    .expect(400)
-    .then(({body}) => {
-      expect(body.msg).toBe('invalid id supplied')
-    })
+      .patch('/api/comments/cat')
+      .send({ inc_votes: 4 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid id supplied')
+      })
   })
   test("PATCH: 404 when attempting to udpate a comment with an id that doesn't exist", () => {
     return request(app)
-    .patch('/api/comments/99999')
-    .send({ inc_votes : 4 })
-    .expect(404)
-    .then(({body}) => {
-      expect(body.msg).toBe('requested ID not found')
-    })
+      .patch('/api/comments/99999')
+      .send({ inc_votes: 4 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('requested ID not found')
+      })
   })
   test('PATCH: 400 when attempting to update a comment with an invalid vote count', () => {
     return request(app)
-    .patch('/api/comments/1')
-    .send({ inc_votes : 'cat' })
-    .expect(400)
-    .then(({body}) => {
-      expect(body.msg).toBe('invalid vote increment supplied')
-    })
+      .patch('/api/comments/1')
+      .send({ inc_votes: 'cat' })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid vote increment supplied')
+      })
   })
   test('PATCH: 400 when attempting to update a comment without an inc_votes value', () => {
     return request(app)
-    .patch('/api/comments/1')
-    .send({ inc_article_id : 4 })
-    .expect(400)
-    .then(({body}) => {
-      expect(body.msg).toBe('invalid vote increment supplied')
-    })
+      .patch('/api/comments/1')
+      .send({ inc_article_id: 4 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid vote increment supplied')
+      })
   })
 })
 describe('/api/users endpoint', () => {
@@ -517,18 +611,19 @@ describe('/api/users endpoint', () => {
       })
   })
 })
-describe("/api/users/:username endpoint", () => {
-  test("GET: 200 should a user with username, avatar_url and name properties", () => {
+describe('/api/users/:username endpoint', () => {
+  test('GET: 200 should a user with username, avatar_url and name properties', () => {
     return request(app)
-    .get('/api/users/butter_bridge')
-    .expect(200)
-    .then(({body}) => {
-      expect(body.user).toMatchObject({
-        username: 'butter_bridge',
-        avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
-        name: 'jonny'
+      .get('/api/users/butter_bridge')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.user).toMatchObject({
+          username: 'butter_bridge',
+          avatar_url:
+            'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+          name: 'jonny',
+        })
       })
-    })
   })
   test("GET: 404 when requesting a user with an username that doesn't exist", () => {
     return request(app)
