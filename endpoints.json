@@ -85,20 +85,44 @@
   },
   "postEndpoints": {
     "POST /api/articles/:article_id/comments": {
-      "description": "posts a comment for an article chosen by its id and returns the newly posted article",
+      "description": "posts a comment for an article chosen by its id and returns the newly posted comment",
       "queries": [],
       "exampleInputFormat": {
         "username": "icellusedkars",
         "body": "Ambidextrous marsupial"
       },
       "exampleResponse": {
-        "postedArticle": {
+        "postedComment": {
           "comment_id": 11,
           "body": "Ambidextrous marsupial",
           "article_id": 3,
           "author": "icellusedkars",
           "votes": 0,
           "created_at": "2020-09-19T23:10:00.000Z"
+        }
+      }
+    },
+    "POST /api/articles": {
+      "description": "post a supplied article",
+      "queries": [],
+      "exampleInputFormat": {
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "article_img_url": "https://whos.image.com/image.jpg"
+      },
+      "exampleResponse": {
+        "postedArticle": {
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "article_img_url": "https://whos.image.com/image.jpg",
+          "article_id": 10,
+          "votes": 0,
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "comment_count": 0
         }
       }
     }

@@ -4,6 +4,7 @@
   "description": "bc-nc-news",
   "main": "listen.js",
   "scripts": {
+    "query-test": "psql -f ./query_test.sql > ./query_test_output.txt",
     "start": "node listen.js",
     "seed-prod": "NODE_ENV=production npm run seed",
     "setup-dbs": "psql -f ./db/setup.sql",
