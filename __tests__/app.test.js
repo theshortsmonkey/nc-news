@@ -163,7 +163,7 @@ describe('/api/articles/:article_id endpoint', () => {
       .then(({ body }) => {
         expect(body.msg).toEqual('invalid vote increment supplied')
       })
-  })
+  })  
 })
 describe('GET /api/articles endpoint', () => {
   test('GET: 200 should return an array of all articles, all articles should have the following core properties: article_id,author,title,topic,created_at,votes,article_img_url', () => {
@@ -543,6 +543,57 @@ describe('/api/articles/:article_id/comments endpoint', () => {
       .then(({ body }) => {
         expect(body.msg).toEqual('supplied username does not exist in database')
       })
+  })
+  test("GET: 200 uses limit query to limit the number of comments returned", () => {
+    return request(app)
+    .get('/api/articles/1/comments?limit=5')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.comments.length).toBe(5)
+    })
+  })
+  test("GET: 200 'p' query should offset the returned comments from the top of the full list, based on default the limit value(10)", () => {
+    return request(app)
+    .get('/api/articles/1/comments?p=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.comments.length).toBe(1)
+      expect(body.comments[0].comment_id).toBe(9)
+    })
+  })
+  test("GET: 200 'p' query should offset the returned comments from the top of the full list, based on the supplied limit value", () => {
+    return request(app)
+    .get('/api/articles/1/comments?p=2&limit=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.comments.length).toBe(2)
+      expect(body.comments[0].comment_id).toBe(18)
+      expect(body.comments[1].comment_id).toBe(13)
+    })
+  })
+  test("GET: 200 returned object has a total_count property set to the total number of articles, discounting the limit", () => {
+    return request(app)
+    .get('/api/articles/1/comments?p=2&limit=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.total_count).toBe(11)
+    })
+  })
+  test('GET: 400 when requesting a limit with an invalid value', () => {
+    return request(app)
+    .get('/api/articles/1/comments?limit=cat')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid query string')
+    })
+  })
+  test('GET: 400 when requesting a page with an invalid value', () => {
+    return request(app)
+    .get('/api/articles/1/comments?p=cat')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid query string')
+    })
   })
 })
 describe('/api/comments/:comment_id endpoint', () => {

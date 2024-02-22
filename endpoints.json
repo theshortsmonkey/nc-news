@@ -11,7 +11,7 @@
       }
     },
     "GET /api/articles": {
-      "description": "serves an array of all articles",
+      "description": "serves an array of all articles, pagination defined by the limit and p queries",
       "queries": ["author", "topic", "sort_by", "order","limit","p (page)"],
       "exampleResponse": {
         "total_count": 10,
@@ -44,9 +44,10 @@
       }
     },
     "GET /api/articles/:article_id/comments": {
-      "description": "serves an array of all comments for an article chosen by its id",
-      "queries": [],
+      "description": "serves an array of all comments for an article chosen by its id, pagination defined by the limit and p queries",
+      "queries": ["limit","p (page)"],
       "exampleResponse": {
+        "total_count": 11,
         "comments": [
           {
             "comment_id": 11,
