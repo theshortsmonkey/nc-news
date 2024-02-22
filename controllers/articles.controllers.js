@@ -11,18 +11,20 @@ const {
 const { selectTopicsBySlug } = require('../models/topics.models')
 
 exports.getArcticles = (req, res, next) => {
-  const { topic, sort_by, order } = req.query
-  const promises = [selectArticles(topic, sort_by, order)]
+  const { topic, sort_by, order, limit} = req.query
+  let {p} = req.query
+  if (limit && !p) { p = 1}
+  const promises = [selectArticles(topic, sort_by, order, limit, p)]
   if (topic) {
     promises.push(selectTopicsBySlug(topic))
   }
   return Promise.all(promises)
     .then((fulfilledPromises) => {
-      articles = fulfilledPromises[0]
+      const {total_count,articles} = fulfilledPromises[0]
       if (articles.length === 0) {
         return res.status(204).send()
       }
-      return res.status(200).send({ articles })
+      return res.status(200).send({total_count, articles })
     })
     .catch(next)
 }

@@ -278,6 +278,65 @@ describe('GET /api/articles endpoint', () => {
         expect(body.articles).toBeSortedBy('author', { descending: false })
       })
   })
+  test("GET: 200 uses limit query to limit the number of articles returned", () => {
+    return request(app)
+    .get('/api/articles?limit=5')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles.length).toBe(5)
+    })
+  })
+  test("GET: 200 'p' query should offset the returned articles from the top of the full list, based on default the limit value(10)", () => {
+    return request(app)
+    .get('/api/articles?p=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles.length).toBe(3)
+      expect(body.articles[0].article_id).toBe(8)
+    })
+  })
+  test("GET: 200 'p' query should offset the returned articles from the top of the full list, based on the supplied limit value", () => {
+    return request(app)
+    .get('/api/articles?p=2&limit=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.articles.length).toBe(2)
+      expect(body.articles[0].article_id).toBe(2)
+      expect(body.articles[1].article_id).toBe(13)
+    })
+  })
+  test("GET: 200 returned object has a total_count property set to the total number of articles, discounting the limit", () => {
+    return request(app)
+    .get('/api/articles?p=2&limit=2')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.total_count).toBe(13)
+    })
+  })
+  test("GET: 200 returned object has a total_count property set to the total number of articles, with the supplied filter applied", () => {
+    return request(app)
+    .get('/api/articles?p=2&limit=2&topic=mitch')
+    .expect(200)
+    .then(({body}) => {
+      expect(body.total_count).toBe(12)
+    })
+  })
+  test('GET: 400 when requesting a limit with an invalid value', () => {
+    return request(app)
+    .get('/api/articles?limit=cat')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid query string')
+    })
+  })
+  test('GET: 400 when requesting a page with an invalid value', () => {
+    return request(app)
+    .get('/api/articles?p=cat')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid query string')
+    })
+  })
 })
 describe("'POST /api/articles endpoint", () => {
   test('POST: 201 should return the posted article', () => {
