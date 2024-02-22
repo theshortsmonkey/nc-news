@@ -20,6 +20,11 @@ exports.handlePsqlErrors = (err, req, res, next) => {
         return res.status(404).send({msg: 'supplied topic does not exist in database'})
       }
       return res.status(404).send({ msg: 'requested ID not found' })
+      case '23505':
+        if (err.constraint.includes('topics_pkey')) {
+          return res.status(422).send('requested topic already exists in database')
+        }
+        return res.status(422).send({msg: 'requested key already exists in database'})
     default:
       next(err)
   }

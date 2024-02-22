@@ -43,6 +43,41 @@ describe('/api/topics endpoint', () => {
         })
       })
   })
+  test('POST: 201 should return the newly posted topic', () => {
+    const topicToPost = {
+      "slug": "dogs",
+      "description": "everyone needs to talk about dogs"}
+    return request(app)
+    .post('/api/topics')
+    .send(topicToPost)
+      .expect(201)
+      .then(({body}) => {
+        expect(body.postedTopic).toMatchObject(topicToPost)
+      })
+  })
+  test("POST: 422 topic already exists in database", () => {
+    const topicToPost = {
+      description: 'Not dogs',
+      slug: 'cats'}
+    return request(app)
+    .post('/api/topics')
+    .send(topicToPost)
+      .expect(422)
+      .then(({res}) => {
+        expect(res.text).toBe('requested topic already exists in database')
+      })
+  })
+  test("POST: 400 malformed body/missing required field", () => {
+    const topicToPost = {
+      "description": "everyone needs to talk about dogs"}
+    return request(app)
+    .post('/api/topics')
+    .send(topicToPost)
+      .expect(400)
+      .then(({body}) => {
+        expect(body.msg).toBe('body missing required field: "slug"')
+      })
+  })
 })
 describe('/api/articles/:article_id endpoint', () => {
   test('GET: 200 should return the article identified by the specified article_id', () => {

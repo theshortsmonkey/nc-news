@@ -127,6 +127,20 @@
           "comment_count": 0
         }
       }
+    },
+    "POST /api/topics": {
+      "description": "post a supplied article",
+      "queries": [],
+      "exampleInputFormat": {
+        "slug": "dogs",
+        "description": "everyone needs to talk about dogs"
+      },
+      "exampleResponse": {
+        "postedTopic": {
+          "slug": "dogs",
+          "description": "everyone needs to talk about dogs"
+        }
+      }
     }
   },
   "patchEndpoints": {
