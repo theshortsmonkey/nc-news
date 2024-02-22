@@ -3,10 +3,12 @@ const {
   selectArticles,
   updateArticleById,
   insertArticle,
+  removeArticleById,
 } = require('../models/articles.models')
 const {
   selectCommentsByArticleId,
   insertCommentByArticleId,
+  removeCommentByArticleId,
 } = require('../models/comments.models')
 const { selectTopicsBySlug } = require('../models/topics.models')
 
@@ -97,4 +99,15 @@ exports.postArticle = (req, res, next) => {
       res.status(201).send({ postedArticle })
     })
     .catch(next)
+}
+
+exports.deleteArticleById = (req,res,next) => {
+  const {article_id} = req.params
+  return removeCommentByArticleId(article_id)
+  .then(() => {
+    return removeArticleById(article_id)
+  }).then(() => {
+    res.status(204).send({})
+  }) 
+  .catch(next)
 }

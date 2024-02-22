@@ -199,6 +199,30 @@ describe('/api/articles/:article_id endpoint', () => {
         expect(body.msg).toEqual('invalid vote increment supplied')
       })
   })  
+  test("DELETE: 204 and no content when successfully deleting an article", () => {
+    return request(app)
+    .delete('/api/articles/1')
+    .expect(204)
+    .then((res) => {
+      expect(res.body).toEqual({})
+    })
+  })
+  test('DELETE: 400 when attempting to delete an article with an invalid id', () => {
+    return request(app)
+      .delete('/api/articles/cat')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('invalid id supplied')
+      })
+  })
+  test("DELETE: 404 when attempting to delete an article with an id that doesn't exist", () => {
+    return request(app)
+      .delete('/api/articles/99999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual('requested ID not found')
+      })
+  })
 })
 describe('GET /api/articles endpoint', () => {
   test('GET: 200 should return an array of all articles, all articles should have the following core properties: article_id,author,title,topic,created_at,votes,article_img_url', () => {
@@ -640,7 +664,7 @@ describe('/api/comments/:comment_id endpoint', () => {
         expect(res.body).toEqual({})
       })
   })
-  test('DELETE: 400 when attempting to delete an article with an invalid id', () => {
+  test('DELETE: 400 when attempting to delete a comment with an invalid id', () => {
     return request(app)
       .delete('/api/comments/cat')
       .expect(400)
@@ -648,7 +672,7 @@ describe('/api/comments/:comment_id endpoint', () => {
         expect(body.msg).toEqual('invalid id supplied')
       })
   })
-  test("DELETE: 404 when attempting to udpate an article with an id that doesn't exist", () => {
+  test("DELETE: 404 when attempting to delete a comment with an id that doesn't exist", () => {
     return request(app)
       .delete('/api/comments/99999')
       .expect(404)
