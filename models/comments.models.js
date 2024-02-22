@@ -85,3 +85,16 @@ exports.selectCommentsByArticleId = (id, limit = 10, p = 0) => {
     return { total_count: count, comments: rows }
   })
 }
+
+exports.removeCommentByArticleId = (articleId) => {
+  return db
+    .query(
+      `DELETE FROM comments
+  WHERE article_id = $1
+  RETURNING *;`,
+      [articleId]
+    )
+    .then((response) => {
+      return response.rowCount
+    })
+}
