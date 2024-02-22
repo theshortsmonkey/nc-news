@@ -21,14 +21,14 @@ exports.formatComments = (comments, idLookup) => {
   })
 }
 
-exports.paginateArrary = (inputArr, limit, page) => {
+exports.paginateArray = (inputArr, limit, page) => {
   if (!limit && !page) {
     return [...inputArr]
   }
   if (!limit) limit = 10
   if (!page) page = 1
-  let startSlice = limit * (page - 1)
-  const endSlice = startSlice + limit
+  const startSlice = limit * (page - 1)
+  const endSlice = startSlice + Number(limit)
   const outputArr = inputArr.slice(startSlice, endSlice)
   return outputArr
 }
