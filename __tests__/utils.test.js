@@ -2,7 +2,8 @@ const {
   convertTimestampToDate,
   createRef,
   formatComments,
-} = require("../db/seeds/utils");
+  paginateArrary,
+} = require("../db/utils");
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -102,3 +103,27 @@ describe("formatComments", () => {
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
   });
 });
+
+describe("paginateArray", () => {
+  it("should take an array and return a new array with the all the items when not supplied a limit or page", () => {
+    const input = [1,2,3,4,5,6,7,8,9,10,11,12]
+    const actual = paginateArrary(input)
+    expect(actual).toEqual(input)
+    expect(actual).not.toBe(input)
+  })
+  it("should return the first return the first 5 items when supplied a limit of 5 and no page", () => {
+    const input = [1,2,3,4,5,6,7,8,9,10]
+    const actual = paginateArrary(input,5)
+    expect(actual).toEqual([1,2,3,4,5])
+  })
+  it("should return the first return the first 10 items when supplied no limit and page number one (i.e. limit defaults to 10)", () => {
+    const input = [1,2,3,4,5,6,7,8,9,10,11,12]
+    const actual = paginateArrary(input,undefined,1)
+    expect(actual).toEqual([1,2,3,4,5,6,7,8,9,10])
+  })
+  it("should return the first return the 3rd and 4th items when supplied a limit of two and page number two", () => {
+    const input = [1,2,3,4,5,6,7,8,9,10,11,12]
+    const actual = paginateArrary(input,2,2)
+    expect(actual).toEqual([3,4])
+  })
+})
