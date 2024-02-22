@@ -7,7 +7,7 @@
     "query-test": "psql -f ./query_test.sql > ./query_test_output.txt",
     "start": "node listen.js",
     "seed-prod": "NODE_ENV=production npm run seed",
-    "setup-dbs": "psql -f ./db/setup.sql",
+    "setup-dbs": "psql -f ./setup.sql",
     "seed": "node ./db/seeds/run-seed.js",
     "test": "jest",
     "prepare": "husky install"
