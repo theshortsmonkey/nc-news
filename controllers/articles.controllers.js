@@ -40,14 +40,20 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params
+  const { limit } = req.query
+  let {p} = req.query
+  if (limit && !p) { p = 1}
   const promises = [
-    selectCommentsByArticleId(article_id),
+    selectCommentsByArticleId(article_id,limit,p),
     selectArticleyById(article_id),
   ]
   return Promise.all(promises)
     .then((fulfilledPromises) => {
-      comments = fulfilledPromises[0]
-      res.status(200).send({ comments })
+      const {total_count,comments} = fulfilledPromises[0]
+      if (comments.length === 0) {
+        return res.status(204).send()
+      }
+      return res.status(200).send({total_count, comments })
     })
     .catch(next)
 }
