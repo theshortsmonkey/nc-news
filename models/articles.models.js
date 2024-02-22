@@ -22,6 +22,9 @@ exports.selectArticles = (
   if (!allowedOrderVals.includes(order)) {
     return Promise.reject({ status: 400, customErrMsg: 'invalid sort order' })
   }
+  if (!(limit >= 0) || !(p >= 0)) {
+    return Promise.reject({status:400, customErrMsg:'invalid query string'})
+  }
   let countQueryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
   let queryString = `SELECT articles.article_id,articles.author, articles.title, articles.topic, TO_CHAR(articles.created_at,'YYYY-MM-DD HH24:MI:SS') created_at, articles.votes, articles.article_img_url, CAST(COUNT(comment_id) AS INT) comment_count 
   FROM articles

@@ -321,8 +321,22 @@ describe.only('GET /api/articles endpoint', () => {
       expect(body.total_count).toBe(12)
     })
   })
-  test.todo('GET: 400 when requesting a limit with an invalid value')
-  test.todo('GET: 400 when requesting a page with an invalid value')
+  test('GET: 400 when requesting a limit with an invalid value', () => {
+    return request(app)
+    .get('/api/articles?limit=cat')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid query string')
+    })
+  })
+  test('GET: 400 when requesting a page with an invalid value', () => {
+    return request(app)
+    .get('/api/articles?p=cat')
+    .expect(400)
+    .then(({body}) => {
+      expect(body.msg).toBe('invalid query string')
+    })
+  })
 })
 describe("'POST /api/articles endpoint", () => {
   test('POST: 201 should return the posted article', () => {
