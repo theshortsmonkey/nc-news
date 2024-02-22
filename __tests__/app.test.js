@@ -165,7 +165,7 @@ describe('/api/articles/:article_id endpoint', () => {
       })
   })
 })
-describe.only('GET /api/articles endpoint', () => {
+describe('GET /api/articles endpoint', () => {
   test('GET: 200 should return an array of all articles, all articles should have the following core properties: article_id,author,title,topic,created_at,votes,article_img_url', () => {
     return request(app)
       .get('/api/articles')
