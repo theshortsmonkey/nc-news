@@ -10,14 +10,20 @@ exports.selectArticles = (
 ) => {
   if (limit) {
     if (!(limit >= 0)) {
-      return Promise.reject({ status: 400, customErrMsg: 'invalid query string' })
+      return Promise.reject({
+        status: 400,
+        customErrMsg: 'invalid query string',
+      })
     }
-  } 
+  }
   if (p) {
     if (!(p >= 0)) {
-      return Promise.reject({ status: 400, customErrMsg: 'invalid query string' })
+      return Promise.reject({
+        status: 400,
+        customErrMsg: 'invalid query string',
+      })
     }
-  } 
+  }
   const allowedSortByVals = [
     'created_at',
     'article_id',
@@ -58,7 +64,7 @@ exports.selectArticles = (
   ]).then((fulfilledPromises) => {
     const { count } = fulfilledPromises[0].rows[0]
     const { rows } = fulfilledPromises[1]
-    return { total_count: count, articles: paginateArray(rows,limit,p) }
+    return { total_count: count, articles: paginateArray(rows, limit, p) }
   })
 }
 
@@ -75,14 +81,14 @@ exports.selectArticleyById = (id) => {
     `) a 
   WHERE article_id = $1`
   const queryVals = [id]
-  return db.query(queryString, queryVals).then(({ rows }) => {
-    if (!rows.length) {
+  return db.query(queryString, queryVals).then((result) => {
+    if (!result.rowCount) {
       return Promise.reject({
         status: 404,
         customErrMsg: 'requested ID not found',
       })
     }
-    return rows[0]
+    return result.rows[0]
   })
 }
 
@@ -97,9 +103,9 @@ exports.updateArticleById = (article_id, body) => {
   return db
     .query(
       `UPDATE articles
-  SET votes = votes + $1
-  WHERE article_id = $2 
-  RETURNING articles.*, TO_CHAR(articles.created_at,'YYYY-MM-DD HH24:MI:SS') created_at;`,
+      SET votes = votes + $1
+      WHERE article_id = $2 
+      RETURNING articles.*, TO_CHAR(articles.created_at,'YYYY-MM-DD HH24:MI:SS') created_at;`,
       [inc_votes, article_id]
     )
     .then(({ rows }) => {
@@ -112,8 +118,8 @@ exports.insertArticle = (suppliedBody) => {
   return db
     .query(
       `INSERT INTO articles (author,title,body,topic)
-  VALUES ($1, $2, $3, $4) 
-  RETURNING articles.*, TO_CHAR(articles.created_at,'YYYY-MM-DD HH24:MI:SS') created_at;`,
+      VALUES ($1, $2, $3, $4) 
+      RETURNING articles.*, TO_CHAR(articles.created_at,'YYYY-MM-DD HH24:MI:SS') created_at;`,
       [author, title, body, topic]
     )
     .then(({ rows }) => {
@@ -125,17 +131,17 @@ exports.removeArticleById = (articleId) => {
   return db
     .query(
       `DELETE FROM articles
-  WHERE article_id = $1
-  RETURNING *;`,
+      WHERE article_id = $1
+      RETURNING *;`,
       [articleId]
     )
-    .then((response) => {
-      if (response.rowCount === 0) {
+    .then((result) => {
+      if (result.rowCount === 0) {
         return Promise.reject({
           status: 404,
           customErrMsg: 'requested ID not found',
         })
       }
-      return response.rowCount
+      return result.rowCount
     })
 }

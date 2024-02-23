@@ -5,8 +5,8 @@ exports.removeCommentById = (id) => {
   return db
     .query(
       `DELETE FROM comments
-  WHERE comment_id = $1
-  RETURNING *;`,
+      WHERE comment_id = $1
+      RETURNING *;`,
       [id]
     )
     .then((res) => {
@@ -29,9 +29,9 @@ exports.updateCommentById = (commentId, votesInc) => {
   return db
     .query(
       `UPDATE comments
-  SET votes = votes + $1
-  WHERE comment_id = $2 
-  RETURNING comments.*, TO_CHAR(comments.created_at,'YYYY-MM-DD HH24:MI:SS') created_at;`,
+      SET votes = votes + $1
+      WHERE comment_id = $2 
+      RETURNING comments.*, TO_CHAR(comments.created_at,'YYYY-MM-DD HH24:MI:SS') created_at;`,
       [votesInc, commentId]
     )
     .then(({ rows }) => {
@@ -45,13 +45,13 @@ exports.updateCommentById = (commentId, votesInc) => {
     })
 }
 
-exports.insertCommentByArticleId = (article_id, comment) => {
+exports.insertCommentByArticleId = (articleId, comment) => {
   const { username, body } = comment
   return db
     .query(
       `INSERT INTO comments (author,body,article_id)
   VALUES ($1, $2,$3) RETURNING *;`,
-      [username, body, article_id]
+      [username, body, articleId]
     )
     .then(({ rows }) => {
       return rows[0]
@@ -61,14 +61,20 @@ exports.insertCommentByArticleId = (article_id, comment) => {
 exports.selectCommentsByArticleId = (id, limit, p) => {
   if (limit) {
     if (!(limit >= 0)) {
-      return Promise.reject({ status: 400, customErrMsg: 'invalid query string' })
+      return Promise.reject({
+        status: 400,
+        customErrMsg: 'invalid query string',
+      })
     }
-  } 
+  }
   if (p) {
     if (!(p >= 0)) {
-      return Promise.reject({ status: 400, customErrMsg: 'invalid query string' })
+      return Promise.reject({
+        status: 400,
+        customErrMsg: 'invalid query string',
+      })
     }
-  } 
+  }
   let countQueryString = `SELECT CAST(COUNT(comments.comment_id) AS INT) FROM comments
   WHERE article_id = $1`
   let queryString = `SELECT comments.comment_id, comments.body,comments.article_id,comments.author,comments.votes, TO_CHAR(comments.created_at,'YYYY-MM-DD HH24:MI:SS') created_at FROM comments
@@ -82,7 +88,7 @@ exports.selectCommentsByArticleId = (id, limit, p) => {
   ]).then((fulfilledPromises) => {
     const { count } = fulfilledPromises[0].rows[0]
     const { rows } = fulfilledPromises[1]
-    return { total_count: count, comments: paginateArray(rows,limit,p) }
+    return { total_count: count, comments: paginateArray(rows, limit, p) }
   })
 }
 
