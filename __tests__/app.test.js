@@ -919,7 +919,7 @@ describe('/api/users endpoint', () => {
           })
       })
     })
-    describe.only("filter functionaltiy", () => {
+    describe("filter functionaltiy", () => {
       test('GET: 200 when using starts_with query to filter usernames starting with specified value', () => {
         return request(app)
           .get('/api/users?starts_with=b')
@@ -931,17 +931,19 @@ describe('/api/users endpoint', () => {
             })
           })
       })
-      xtest('GET: 200 multiple valid queries processed correctly', () => {
+      test('GET: 200 multiple valid queries processed correctly', () => {
         return request(app)
-          .get('/api/users?sort_by=author&order=asc&topic=mitch')
+          .get('/api/users?sort_by=username&order=desc&starts_with=b')
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).toHaveLength(12)
-            body.articles.forEach((article) => {
-              expect(article.topic).toBe('mitch')
+            expect(body.users).toHaveLength(1)
+            body.users.forEach((user) => {
+              expect(user.username).toBe('butter_bridge')
             })
-            expect(body.articles).toBeSortedBy('author', { descending: false })
           })
+      })
+      test('GET 204 when supplied starts_with that has no users associated with it', () => {
+        return request(app).get('/api/users?starts_with=c').expect(204)
       })
     })
   })

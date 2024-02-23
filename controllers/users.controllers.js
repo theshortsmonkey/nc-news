@@ -4,7 +4,11 @@ exports.getUsers = (req, res, next) => {
   const {sort_by,order,limit,p,starts_with} = req.query
   return selectUsers(sort_by,order,limit,p,starts_with)
     .then((body) => {
-      res.status(200).send(body)
+      const { total_count, users } = body
+      if (users.length === 0) {
+        return res.status(204).send()
+      }
+      res.status(200).send({total_count,users})
     })
     .catch(next)
 }

@@ -3,21 +3,17 @@ const { paginateArray } = require('../db/utils.js')
 const format = require('pg-format')
 
 exports.selectUsers = (sortBy='username',order='asc',limit,p,startsWith) => {
-  if (limit) {
-    if (!(limit >= 0)) {
+  if (limit && !(limit >= 0)) {
       return Promise.reject({
         status: 400,
         customErrMsg: 'invalid query string',
       })
-    }
   }
-  if (p) {
-    if (!(p >= 0)) {
+  if (p && !(p >= 0)) {
       return Promise.reject({
         status: 400,
         customErrMsg: 'invalid query string',
       })
-    }
   }
   const allowedSortByVals = ['username','name']
   if (!allowedSortByVals.includes(sortBy)) {
@@ -42,8 +38,6 @@ exports.selectUsers = (sortBy='username',order='asc',limit,p,startsWith) => {
     countQueryString += ` WHERE username LIKE $1`
     countQueryVals.push(startsWith+'%')
   }
-  console.log(queryString,queryVals)
-  console.log(countQueryString,countQueryVals)
   return Promise.all([
     db.query(countQueryString,countQueryVals),
     db.query(queryString,queryVals),
