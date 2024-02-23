@@ -1,6 +1,6 @@
 const { count } = require('console')
 const db = require('../db/connection.js')
-const { paginateArray, filterQueryUpdate } = require('../db/utils.js')
+const { paginateArray, filterQueryUpdate } = require('../utils/utils.js')
 
 exports.selectArticles = (
   topic,

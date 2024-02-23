@@ -1,5 +1,5 @@
 const db = require('../db/connection.js')
-const { paginateArray } = require('../db/utils.js')
+const { paginateArray } = require('../utils/utils.js')
 
 exports.removeCommentById = (id) => {
   return db

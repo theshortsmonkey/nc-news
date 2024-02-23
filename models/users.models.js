@@ -1,6 +1,6 @@
 const { start } = require('repl')
 const db = require('../db/connection.js')
-const { paginateArray, filterQueryUpdate } = require('../db/utils.js')
+const { paginateArray, filterQueryUpdate } = require('../utils/utils.js')
 
 exports.selectUsers = (sortBy='username',order='asc',limit,p,startsWith) => {
   if (limit && !(limit >= 0)) {
@@ -30,8 +30,6 @@ exports.selectUsers = (sortBy='username',order='asc',limit,p,startsWith) => {
   const baseQueryString = `SELECT * FROM users`  
   let {queryString,queryVals} = filterQueryUpdate('username',startsWith,baseQueryString,[],false,startsWith + '%')
   queryString += ` ORDER BY users.${sortBy} ${order}`
-  console.log(countQueryString, countQueryVals)
-  console.log(queryString, queryVals)
   return Promise.all([
     db.query(countQueryString,countQueryVals),
     db.query(queryString,queryVals),

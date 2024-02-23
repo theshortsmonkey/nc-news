@@ -5,7 +5,7 @@ const {
   formatComments,
   paginateArray,
   filterQueryUpdate,
-} = require("../db/utils");
+} = require("../utils/utils");
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
