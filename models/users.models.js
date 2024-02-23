@@ -1,7 +1,8 @@
 const db = require('../db/connection.js')
 const { paginateArray } = require('../db/utils.js')
+const format = require('pg-format')
 
-exports.selectUsers = (sortBy='username',order='asc',limit,p) => {
+exports.selectUsers = (sortBy='username',order='asc',limit,p,startsWith) => {
   if (limit) {
     if (!(limit >= 0)) {
       return Promise.reject({
@@ -26,14 +27,26 @@ exports.selectUsers = (sortBy='username',order='asc',limit,p) => {
   if (!allowedOrderVals.includes(order)) {
     return Promise.reject({ status: 400, customErrMsg: 'invalid sort order' })
   }
-  const countQueryString = `SELECT CAST(COUNT(users.username) AS INT) FROM users;`
-  const queryString = `SELECT * FROM users
+  let countQueryString = `SELECT CAST(COUNT(users.username) AS INT) FROM users`
+  let queryString = `SELECT * FROM users
   ORDER BY users.${sortBy} ${order}`
   const countQueryVals = []
   const queryVals = []
+  if (startsWith) {
+    queryString =
+      `SELECT * FROM (` +
+      queryString +
+      `) a 
+    WHERE username LIKE $1`
+    queryVals.push(startsWith+'%')
+    countQueryString += ` WHERE username LIKE $1`
+    countQueryVals.push(startsWith+'%')
+  }
+  console.log(queryString,queryVals)
+  console.log(countQueryString,countQueryVals)
   return Promise.all([
-    db.query(countQueryString),
-    db.query(queryString),
+    db.query(countQueryString,countQueryVals),
+    db.query(queryString,queryVals),
   ]).then((fulfilledPromises) => {
     const { count } = fulfilledPromises[0].rows[0]
     const { rows } = fulfilledPromises[1]

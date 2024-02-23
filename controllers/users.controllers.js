@@ -1,8 +1,8 @@
 const { selectUsers, selectUserByUsername } = require('../models/users.models')
 
 exports.getUsers = (req, res, next) => {
-  const {sort_by,order,limit,p} = req.query
-  return selectUsers(sort_by,order,limit,p)
+  const {sort_by,order,limit,p,starts_with} = req.query
+  return selectUsers(sort_by,order,limit,p,starts_with)
     .then((body) => {
       res.status(200).send(body)
     })

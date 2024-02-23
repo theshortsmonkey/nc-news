@@ -919,8 +919,8 @@ describe('/api/users endpoint', () => {
           })
       })
     })
-    describe("filter fucntionaltiy", () => {
-      xtest('GET: 200 when using starts_with query to filter usernames starting with specified value', () => {
+    describe.only("filter functionaltiy", () => {
+      test('GET: 200 when using starts_with query to filter usernames starting with specified value', () => {
         return request(app)
           .get('/api/users?starts_with=b')
           .expect(200)
