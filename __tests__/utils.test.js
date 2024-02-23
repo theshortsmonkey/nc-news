@@ -150,9 +150,9 @@ describe("filter query creation function", () => {
     expect(actual.queryVals).toEqual(['mitch'])
   })
   it("should update the supplied query using the next dollar value and add vals to an array with the defined filter and value", () => {
-    const queryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
+    const queryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles WHERE topic = $1`
     const actual = filterQueryUpdate('topic','mitch',queryString,['paul'])
-    expect(actual.queryString).toBe('SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles WHERE topic = $2')
+    expect(actual.queryString).toBe('SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles WHERE topic = $1 AND topic = $2')
     expect(actual.queryVals).toEqual(['paul','mitch'])
   })
   it("should not mutate the supplied array",() => {

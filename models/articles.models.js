@@ -3,11 +3,11 @@ const db = require('../db/connection.js')
 const { paginateArray, filterQueryUpdate } = require('../utils/utils.js')
 
 exports.selectArticles = (
-  topic,
   sortBy = 'created_at',
   order = 'desc',
   limit,
-  p
+  p,
+  ...filters
 ) => {
   if (limit && !(limit >= 0)) {
       return Promise.reject({
@@ -36,16 +36,23 @@ exports.selectArticles = (
   if (!allowedOrderVals.includes(order)) {
     return Promise.reject({ status: 400, customErrMsg: 'invalid sort order' })
   }
-  const baseCountQueryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
-  const output = filterQueryUpdate('topic',topic,baseCountQueryString,[])
-  const countQueryString = output.queryString
-  const countQueryVals = output.queryVals
-  const  baseQueryString = `SELECT articles.article_id,articles.author, articles.title, articles.topic, TO_CHAR(articles.created_at,'YYYY-MM-DD HH24:MI:SS') created_at, articles.votes, articles.article_img_url, CAST(COUNT(comment_id) AS INT) comment_count 
+  let countQueryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
+  let countQueryVals = []
+  let  queryString = `SELECT articles.article_id,articles.author, articles.title, articles.topic, TO_CHAR(articles.created_at,'YYYY-MM-DD HH24:MI:SS') created_at, articles.votes, articles.article_img_url, CAST(COUNT(comment_id) AS INT) comment_count 
   FROM articles
   LEFT OUTER JOIN comments ON articles.article_id = comments.article_id
   GROUP BY articles.article_id 
   ORDER BY articles.${sortBy} ${order}`
-  const {queryString,queryVals} = filterQueryUpdate('topic',topic,baseQueryString,[],true)
+  let queryVals = []
+  const filterColumns = ['topic','author']
+  filters.forEach((filter,index) => {
+    const output = filterQueryUpdate(filterColumns[index],filter,countQueryString,countQueryVals)
+    countQueryString = output.queryString
+    countQueryVals = output.queryVals
+    const output2 = filterQueryUpdate(filterColumns[index],filter,queryString,queryVals,true)
+    queryString = output2.queryString
+    queryVals = output2.queryVals
+  })
   
   return Promise.all([
     db.query(countQueryString, countQueryVals),
