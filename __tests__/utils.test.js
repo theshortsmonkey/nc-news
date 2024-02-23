@@ -1,8 +1,10 @@
+const { file } = require("@babel/types");
 const {
   convertTimestampToDate,
   createRef,
   formatComments,
   paginateArray,
+  filterQueryUpdate,
 } = require("../db/utils");
 
 describe("convertTimestampToDate", () => {
@@ -125,5 +127,39 @@ describe("paginateArray", () => {
     const input = [1,2,3,4,5,6,7,8,9,10,11,12]
     const actual = paginateArray(input,2,2)
     expect(actual).toEqual([3,4])
+  })
+})
+
+describe("filter query creation function", () => {
+  it("should return the supplied query and array when the supplied filter value is undefined", () => {
+    const queryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
+    const actual = filterQueryUpdate('topic',undefined,queryString,[])
+    expect(actual.queryString).toBe(queryString)
+    expect(actual.queryVals).toEqual([])
+  })
+  it("should update the supplied query and empty vals array with the defined filter and value", () => {
+    const queryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
+    const actual = filterQueryUpdate('topic','mitch',queryString,[])
+    expect(actual.queryString).toBe('SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles WHERE topic = $1')
+    expect(actual.queryVals).toEqual(['mitch'])
+  })
+  it("should update accept a boolean of true to supply the original query wrapped in a sub query string", () => {
+    const queryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
+    const actual = filterQueryUpdate('topic','mitch',queryString,[],true)
+    expect(actual.queryString).toBe('SELECT * FROM (SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles) a WHERE topic = $1')
+    expect(actual.queryVals).toEqual(['mitch'])
+  })
+  it("should update the supplied query using the next dollar value and add vals to an array with the defined filter and value", () => {
+    const queryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
+    const actual = filterQueryUpdate('topic','mitch',queryString,['paul'])
+    expect(actual.queryString).toBe('SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles WHERE topic = $2')
+    expect(actual.queryVals).toEqual(['paul','mitch'])
+  })
+  it("should not mutate the supplied array",() => {
+    const queryString = `SELECT CAST(COUNT(articles.article_id) AS INT) FROM articles`
+    const inputArr = ['paul']
+    const copyInputArr = ['paul']
+    filterQueryUpdate('topic','mitch',queryString,inputArr)
+    expect(inputArr).toEqual(copyInputArr)
   })
 })

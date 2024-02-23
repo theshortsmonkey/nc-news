@@ -11,8 +11,8 @@
       }
     },
     "GET /api/articles": {
-      "description": "serves an array of all articles, pagination defined by the limit and p queries",
-      "queries": ["author", "topic", "sort_by", "order","limit","p (page)"],
+      "description": "serves an array of all articles, pagination defined by the limit and p queries. total_count key which defines the total count of articles, once filters applied",
+      "queries": ["author", "topic", "sort_by", "order", "limit", "p (page)"],
       "exampleResponse": {
         "total_count": 10,
         "articles": [
@@ -44,8 +44,8 @@
       }
     },
     "GET /api/articles/:article_id/comments": {
-      "description": "serves an array of all comments for an article chosen by its id, pagination defined by the limit and p queries",
-      "queries": ["limit","p (page)"],
+      "description": "serves an array of all comments for an article chosen by its id, pagination defined by the limit and p queries. total_count key provided which totals all comments.",
+      "queries": ["limit", "p (page)"],
       "exampleResponse": {
         "total_count": 11,
         "comments": [
@@ -61,9 +61,10 @@
       }
     },
     "GET /api/users": {
-      "description": "serves an array of all users",
-      "queries": [],
+      "description": "serves an array of all users,pagination defined by the limit and p queries. Username filter based on the start_with query.total_count key which defines the total count of articles, once filters applied",
+      "queries": ["sort_by", "order", "limit", "p (page)", "starts_with"],
       "exampleResponse": {
+        "total_count": 11,
         "users": [
           {
             "username": "butter_bridge",

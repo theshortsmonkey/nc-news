@@ -59,21 +59,17 @@ exports.insertCommentByArticleId = (articleId, comment) => {
 }
 
 exports.selectCommentsByArticleId = (id, limit, p) => {
-  if (limit) {
-    if (!(limit >= 0)) {
+  if (limit && !(limit >= 0)) {
       return Promise.reject({
         status: 400,
         customErrMsg: 'invalid query string',
       })
-    }
   }
-  if (p) {
-    if (!(p >= 0)) {
+  if (p && !(p >= 0)) {
       return Promise.reject({
         status: 400,
         customErrMsg: 'invalid query string',
       })
-    }
   }
   let countQueryString = `SELECT CAST(COUNT(comments.comment_id) AS INT) FROM comments
   WHERE article_id = $1`

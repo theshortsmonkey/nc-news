@@ -32,3 +32,18 @@ exports.paginateArray = (inputArr, limit, page) => {
   const outputArr = inputArr.slice(startSlice, endSlice)
   return outputArr
 }
+
+exports.filterQueryUpdate = (filter,value,queryString,queryVals,subQuery) => {
+  const copyQueryVals = [...queryVals]
+  if (value) {
+    copyQueryVals.push(value)
+    if (subQuery) {
+      queryString =
+        `SELECT * FROM (` +
+        queryString +
+        `) a`
+    }
+    queryString += ` WHERE ${filter} = $${copyQueryVals.length}`
+  }
+  return {queryString,queryVals: copyQueryVals}
+}
