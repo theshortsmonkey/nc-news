@@ -162,4 +162,10 @@ describe("filter query creation function", () => {
     filterQueryUpdate('topic','mitch',queryString,inputArr)
     expect(inputArr).toEqual(copyInputArr)
   })
+  it("should update accept a 'like' value to supply the syntax of the where statement", () => {
+    const queryString = `SELECT CAST(COUNT(users.username) AS INT) FROM users`
+    const actual = filterQueryUpdate('username','b',queryString,[],false,'b'+'%')
+    expect(actual.queryString).toBe('SELECT CAST(COUNT(users.username) AS INT) FROM users WHERE username LIKE $1')
+    expect(actual.queryVals).toEqual(['b%'])
+  })
 })
