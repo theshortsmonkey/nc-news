@@ -808,7 +808,7 @@ describe('/api/comments/:comment_id endpoint', () => {
     })
   })
 })
-describe.only('/api/users endpoint', () => {
+describe('/api/users endpoint', () => {
   describe('GET method', () => {
     test('GET: 200 should return an array of all users with username, name and avatar_url properties to the client', () => {
       return request(app)
