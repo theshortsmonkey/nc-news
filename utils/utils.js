@@ -33,23 +33,32 @@ exports.paginateArray = (inputArr, limit, page) => {
   return outputArr
 }
 
-exports.filterQueryUpdate = (filter,value,queryString,queryVals,subQuery,likeString) => {
+exports.filterQueryUpdate = (
+  filter,
+  value,
+  queryString,
+  queryVals,
+  subQuery,
+  likeString
+) => {
   const copyQueryVals = [...queryVals]
   if (value) {
     if (subQuery) {
       queryString =
-        `SELECT * FROM (` +
-        queryString +
-        `) a`
+        `SELECT * FROM (` + queryString + `) a${copyQueryVals.length}`
     }
     let whereOperator = '='
-    if(likeString) {
+    if (likeString) {
       whereOperator = 'LIKE'
       copyQueryVals.push(likeString)
     } else {
       copyQueryVals.push(value)
     }
-    queryString += ` WHERE ${filter} ${whereOperator} $${copyQueryVals.length}`
+    if (copyQueryVals.length === 1 || subQuery) {
+      queryString += ` WHERE ${filter} ${whereOperator} $${copyQueryVals.length}`
+    } else {
+      queryString += ` AND ${filter} ${whereOperator} $${copyQueryVals.length}`
+    }
   }
-  return {queryString,queryVals: copyQueryVals}
+  return { queryString, queryVals: copyQueryVals }
 }

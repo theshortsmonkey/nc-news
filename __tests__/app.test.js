@@ -328,6 +328,29 @@ describe('/api/articles endpoint', () => {
             expect(body.total_count).toBe(12)
           })
       })
+      test('GET: 200 returned articles should be filtered by the specified author in the supplied query', () => {
+        return request(app)
+          .get('/api/articles?author=rogersop')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toHaveLength(3)
+            body.articles.forEach((article) => {
+              expect(article.author).toEqual('rogersop')
+            })
+          })
+      })
+      test('GET: 200 returned articles should be filtered by the specified all supplied queries', () => {
+        return request(app)
+          .get('/api/articles?author=rogersop&topic=mitch')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toHaveLength(2)
+            body.articles.forEach((article) => {
+              expect(article.author).toEqual('rogersop')
+              expect(article.topic).toEqual('mitch')
+            })
+          })
+      })
     })
     describe('sort functionality', () => {
       test('GET: 200 uses sort_by query to sort the articles by valid column in descending order', () => {

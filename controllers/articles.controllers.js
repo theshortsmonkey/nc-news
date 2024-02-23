@@ -11,12 +11,16 @@ const {
   removeCommentByArticleId,
 } = require('../models/comments.models')
 const { selectTopicsBySlug } = require('../models/topics.models')
+const { selectUserByUsername } = require('../models/users.models')
 
 exports.getArcticles = (req, res, next) => {
-  const { topic, sort_by, order, limit, p } = req.query
-  const promises = [selectArticles(topic, sort_by, order, limit, p)]
+  const { topic, author, sort_by, order, limit, p } = req.query
+  const promises = [selectArticles(sort_by, order, limit, p, topic, author)]
   if (topic) {
     promises.push(selectTopicsBySlug(topic))
+  }
+  if (author) {
+    promises.push(selectUserByUsername(author))
   }
   return Promise.all(promises)
     .then((fulfilledPromises) => {
