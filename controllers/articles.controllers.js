@@ -40,12 +40,11 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params
-  const { limit ,p } = req.query
-  const promises = [
+  const { limit, p } = req.query
+  return Promise.all([
     selectCommentsByArticleId(article_id, limit, p),
     selectArticleyById(article_id),
-  ]
-  return Promise.all(promises)
+  ])
     .then((fulfilledPromises) => {
       const { total_count, comments } = fulfilledPromises[0]
       if (comments.length === 0) {
@@ -59,13 +58,12 @@ exports.getCommentsByArticleId = (req, res, next) => {
 exports.postCommentByArticleId = (req, res, next) => {
   const { article_id } = req.params
   const { body } = req
-  const promises = [
+  return Promise.all([
     insertCommentByArticleId(article_id, body),
     selectArticleyById(article_id),
-  ]
-  return Promise.all(promises)
+  ])
     .then((fulfilledPromises) => {
-      postedComment = fulfilledPromises[0]
+      const postedComment = fulfilledPromises[0]
       res.status(201).send({ postedComment })
     })
     .catch(next)
@@ -73,14 +71,12 @@ exports.postCommentByArticleId = (req, res, next) => {
 
 exports.patchArticleById = (req, res, next) => {
   const { article_id } = req.params
-  const promises = [
+  return Promise.all([
     updateArticleById(article_id, req.body),
     selectArticleyById(article_id),
-  ]
-
-  return Promise.all(promises)
+  ])
     .then((fulfilledPromises) => {
-      updatedArticle = fulfilledPromises[0]
+      const updatedArticle = fulfilledPromises[0]
       res.status(200).send({ updatedArticle })
     })
     .catch(next)

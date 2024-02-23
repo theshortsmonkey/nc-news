@@ -10,9 +10,9 @@ const {
 } = require('../controllers/articles.controllers')
 
 articlesRouter
-.route('/')
-.get(getArcticles)
-.post(postArticle)
+  .route('/')
+  .get(getArcticles)
+  .post(postArticle)
 
 articlesRouter
   .route('/:article_id')
