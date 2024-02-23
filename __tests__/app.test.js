@@ -808,7 +808,7 @@ describe('/api/comments/:comment_id endpoint', () => {
     })
   })
 })
-describe('/api/users endpoint', () => {
+describe.only('/api/users endpoint', () => {
   describe('GET method', () => {
     test('GET: 200 should return an array of all users with username, name and avatar_url properties to the client', () => {
       return request(app)
@@ -822,6 +822,127 @@ describe('/api/users endpoint', () => {
             expect(typeof user.avatar_url).toBe('string')
           })
         })
+    })
+    test('GET: 200 should return a total_count property', () => {
+      return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.total_count).toBe(4)
+      })
+    })
+    describe('sort functionality', () => {
+      test('GET: 200 uses sort_by query to sort the users by valid column in ascending order', () => {
+        return request(app)
+          .get('/api/users?sort_by=username')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users).toBeSortedBy('username', { descending: false })
+          })
+      })
+      test('GET: 400 when using a sort_by query with an invalid column name', () => {
+        return request(app)
+          .get('/api/users?sort_by=cat')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toEqual('invalid sort column')
+          })
+      })
+      test('GET: 200 uses order query to define the sort order of the supplied articles, sorted by default of username', () => {
+        return request(app)
+          .get('/api/users?order=desc')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users).toBeSortedBy('username', {
+              descending: true,
+            })
+          })
+      })
+      test('GET: 400 when using a order query with an invalid direction', () => {
+        return request(app)
+          .get('/api/users?order=none')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toEqual('invalid sort order')
+          })
+      })
+      test('GET: 200 multiple valid queries processed correctly', () => {
+        return request(app)
+          .get('/api/users?sort_by=name&order=desc')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users).toBeSortedBy('name', { descending: true })
+          })
+      })
+    })
+    describe('pagination functionality', () => {
+      test('GET: 200 uses limit query to limit the number of users returned', () => {
+        return request(app)
+          .get('/api/users?limit=2')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users.length).toBe(2)
+          })
+      })
+      test("GET: 200 'p' query should offset the returned users from the top of the full list, based on default the limit value(10)", () => {
+        return request(app)
+          .get('/api/users?p=1')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users.length).toBe(4)
+          })
+      })
+      test("GET: 200 'p' query should offset the returned users from the top of the full list, based on the supplied limit value", () => {
+        return request(app)
+          .get('/api/users?p=2&limit=2')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users.length).toBe(2)
+            expect(body.users[0].username).toBe('lurker')
+            expect(body.users[1].username).toBe('rogersop')
+          })
+      })
+      test('GET: 400 when requesting a limit with an invalid value', () => {
+        return request(app)
+          .get('/api/users?limit=cat')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('invalid query string')
+          })
+      })
+      test('GET: 400 when requesting a page with an invalid value', () => {
+        return request(app)
+          .get('/api/users?p=cat')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('invalid query string')
+          })
+      })
+    })
+    describe("filter fucntionaltiy", () => {
+      xtest('GET: 200 when using starts_with query to filter usernames starting with specified value', () => {
+        return request(app)
+          .get('/api/users?starts_with=b')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.users).toHaveLength(1)
+            body.users.forEach((user) => {
+              expect(user.username).toBe('butter_bridge')
+            })
+          })
+      })
+      xtest('GET: 200 multiple valid queries processed correctly', () => {
+        return request(app)
+          .get('/api/users?sort_by=author&order=asc&topic=mitch')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toHaveLength(12)
+            body.articles.forEach((article) => {
+              expect(article.topic).toBe('mitch')
+            })
+            expect(body.articles).toBeSortedBy('author', { descending: false })
+          })
+      })
     })
   })
 })

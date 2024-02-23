@@ -1,9 +1,10 @@
 const { selectUsers, selectUserByUsername } = require('../models/users.models')
 
 exports.getUsers = (req, res, next) => {
-  return selectUsers()
-    .then((users) => {
-      res.status(200).send({ users })
+  const {sort_by,order,limit,p} = req.query
+  return selectUsers(sort_by,order,limit,p)
+    .then((body) => {
+      res.status(200).send(body)
     })
     .catch(next)
 }
