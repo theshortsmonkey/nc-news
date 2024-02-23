@@ -15,18 +15,3 @@ jobs:
         run: npm ci
       - name: run utils tests
         run: npm run test-utils
-  test:
-    name: App Test
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: install dependencies
-        run: npm ci
-      - name: Use PostgreSQL
-        uses: harmon758/postgresql-action@v1
-        with:
-          postgresql db: 'my_db'
-          postgresql user: 'tester'
-          postgresql password: 'password'
-      - name: run app tests
-        run: PGDATABASE=mydb PGUSER='tester' PGPASSWORD=password npm run test-utils
